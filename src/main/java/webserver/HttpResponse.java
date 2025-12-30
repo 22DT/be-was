@@ -45,15 +45,12 @@ public class HttpResponse {
     public int getStatusCode() {
         return statusCode;
     }
-
     public String getMessage() {
         return message;
     }
-
     public Map<String, String> getHeaders() {
         return headers;
     }
-
     public byte[] getBody() {
         return body;
     }

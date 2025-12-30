@@ -11,12 +11,6 @@ public class HttpRequestParser {
 
     public static HttpRequest parse(InputStream in) throws IOException {
 
-        /*
-         * InputStream: 바이트 단위로 데이터를 읽는다.
-         * InputSteamReader: 바이트를 읽어서 문자로 변환. socket read 호출에 문자 하나 -> 비효율 500 글자면?
-         * BufferReader: 메모리에 왕찰 올려서 거기서 한 줄씩 읽음?
-         * */
-
         BufferedReader reader =
                 new BufferedReader(new InputStreamReader(in));
 
@@ -42,7 +36,6 @@ public class HttpRequestParser {
                 headers.put(key, value);
             }
         }
-
 
         return new HttpRequest(method, path, version, headers);
     }

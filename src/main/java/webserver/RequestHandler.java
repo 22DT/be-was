@@ -27,22 +27,10 @@ public class RequestHandler implements Runnable {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             DataOutputStream dos = new DataOutputStream(out);
-//            byte[] body = "<h1>Hello World</h1>".getBytes();
-
-            byte[] body = new byte[0];
 
             /*
-            * request
-            *
-            *
-            *
-            * 클라이언트가 HTTP 메시지를 보내면 소켓에 바이트스트림으로 저장되어 있음.
-            * 왜 바이트 ? ->네 트워크는 0과 1만 앎. 다른 데이터 타입(문자열, int, 객체 등)은 상위 계층이 사용하는 타입임.
-            * 해당 바이트스트림을 HTTP Request 객체로 변환
-            * 왜? HTTP는 프로토콜임. 프로토콜은 형식과 의미를 갖음.
-            * HTTP는 정해진 구조를 가지므로 이를 코드에서 다루기 위해 객채료 표현할 수 있음.
-            * 또한, 의미는 필드명 or 타입으로 나타낼 수 있음.
-            * */
+             * request
+             * */
 
             HttpRequest request = HttpRequestParser.parse(in);
 
@@ -50,13 +38,14 @@ public class RequestHandler implements Runnable {
             logHttpRequest(request);
 
             /*
-            * response
-            *
-            * 마찬가지로 HTTP 응답 또한 객채로 관리할 수 있음.
-            * HTTP 응답을 만들고 소켓에 작성.
-            * */
+             * 비즈니스 로직
+             * */
 
-            HttpResponse response= handleRequest(request);
+            HttpResponse response = handleRequest(request);
+
+            /*
+             * response
+             * */
 
             HttpResponseWriter.write(dos, response);
 
@@ -64,27 +53,6 @@ public class RequestHandler implements Runnable {
             logger.error(e.getMessage());
         }
     }
-
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
 
     private HttpResponse handleRequest(HttpRequest request) {
         String path = request.getPath();
@@ -120,9 +88,6 @@ public class RequestHandler implements Runnable {
         if (path.endsWith(".jpg") || path.endsWith(".jpeg")) return "image/jpeg";
         return "application/octet-stream";
     }
-
-
-
 
     private void logHttpRequest(HttpRequest request) {
 
