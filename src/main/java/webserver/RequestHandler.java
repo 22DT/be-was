@@ -97,6 +97,15 @@ public class RequestHandler implements Runnable {
         logger.debug("Path    : {}", request.getPath());
         logger.debug("Version : {}", request.getVersion());
 
+        logger.debug("----- Query Params -----");
+        if (request.getQueryParams().isEmpty()) {
+            logger.debug("(none)");
+        } else {
+            request.getQueryParams().forEach((key, value) ->
+                    logger.debug("{} = {}", key, value)
+            );
+        }
+
         logger.debug("----- Headers -----");
         request.getHeaders().forEach((key, value) ->
                 logger.debug("{}: {}", key, value)

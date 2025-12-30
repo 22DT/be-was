@@ -22,10 +22,29 @@ public class HttpRequestParser {
 
         String[] parts = requestLine.split(" ");
         String method = parts[0];
-        String path = parts[1];
+        String url = parts[1];
         String version = parts[2];
 
-        // 2. Headers
+
+        // 2. url 에서 path / query 분리
+        String[] urlParts = url.split("\\?");
+        String path = urlParts[0];
+
+        Map<String, String> queryParams = new HashMap<>();
+
+        if(urlParts.length==2){
+            String queryString=urlParts[1];
+
+            String[] pairs=queryString.split("&");
+            for(String pair:pairs){
+                String[] kv=pair.split("=", 2);
+                String key=kv[0];
+                String value = (kv.length == 2) ? kv[1] : ""; // ex) /create?userId&pass <= 이런 예외
+                queryParams.put(key, value);
+            }
+        }
+
+        // 3. Headers
         Map<String, String> headers = new HashMap<>();
         String line;
         while ((line = reader.readLine()) != null && !line.isEmpty()) {
@@ -37,6 +56,6 @@ public class HttpRequestParser {
             }
         }
 
-        return new HttpRequest(method, path, version, headers);
+        return new HttpRequest(method, path, queryParams, version, headers);
     }
 }
