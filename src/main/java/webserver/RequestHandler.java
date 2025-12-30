@@ -61,8 +61,9 @@ public class RequestHandler implements Runnable {
 
             File file = new File(STATIC_DIR + path);
 
-            if (!file.exists() || !file.isFile()) {
-                return HttpResponse.notFound();
+            if (file.isDirectory()) {
+                path=path+"/index.html";
+                file = new File(STATIC_DIR + path);
             }
 
             byte[] body = Files.readAllBytes(file.toPath());
