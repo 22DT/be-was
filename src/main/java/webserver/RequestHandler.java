@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
@@ -62,7 +61,7 @@ public class RequestHandler implements Runnable {
             File file = new File(STATIC_DIR + path);
 
             if (file.isDirectory()) {
-                path=path+"/index.html";
+                path = path + "/index.html";
                 file = new File(STATIC_DIR + path);
             }
 
@@ -81,11 +80,11 @@ public class RequestHandler implements Runnable {
 
     private String resolveContentType(String path) {
         if (path.endsWith(".html")) return "text/html; charset=UTF-8";
-        if (path.endsWith(".css"))  return "text/css; charset=UTF-8";
-        if (path.endsWith(".js"))   return "application/javascript; charset=UTF-8";
-        if (path.endsWith(".svg"))  return "image/svg+xml";
-        if(path.endsWith("ico")) return "image/x-icon";
-        if (path.endsWith(".png"))  return "image/png";
+        if (path.endsWith(".css")) return "text/css; charset=UTF-8";
+        if (path.endsWith(".js")) return "application/javascript; charset=UTF-8";
+        if (path.endsWith(".svg")) return "image/svg+xml";
+        if (path.endsWith("ico")) return "image/x-icon";
+        if (path.endsWith(".png")) return "image/png";
         if (path.endsWith(".jpg") || path.endsWith(".jpeg")) return "image/jpeg";
         return "application/octet-stream";
     }

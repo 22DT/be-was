@@ -21,7 +21,14 @@ public class HttpRequestParser {
         }
 
         String[] parts = requestLine.split(" ");
-        String method = parts[0];
+        HttpMethod method = HttpMethod.of(parts[0]);
+
+        if(method==null){
+            throw new IllegalArgumentException(
+                    "Unsupported HTTP method: " + method
+            );
+        }
+
         String url = parts[1];
         String version = parts[2];
 

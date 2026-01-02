@@ -9,13 +9,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Database {
     private static Map<String, User> users = new ConcurrentHashMap<>();
 
-    public static void addUser(User user) {
+    public static User addUser(User user) {
         User prev = users.putIfAbsent(user.getUserId(), user);
-        if (prev != null) {
-            throw new IllegalArgumentException(
-                    "이미 존재하는 userId: " + user.getUserId()
-            );
-        }
+
+        return prev;
     }
 
     public static User findUserById(String userId) {
