@@ -7,6 +7,8 @@ import webserver.HttpRequest;
 import webserver.HttpResponse;
 import webserver.WebServer;
 
+import java.nio.charset.StandardCharsets;
+
 public class UserHandler {
     private static final Logger logger = LoggerFactory.getLogger(WebServer.class);
 
@@ -42,7 +44,8 @@ public class UserHandler {
         * response
         * */
 
-
+        response.setStatus(201, "Created");
+        response.setBody("회원가입 성공".getBytes(StandardCharsets.UTF_8));
     }
 
     public void login(HttpRequest request, HttpResponse response) {
@@ -74,7 +77,7 @@ public class UserHandler {
         // 3. 로그인 성공
         // (현재는 성공 처리만, 세션/상태 없음)
 
-        
+
         /*
         * response
         * */
