@@ -27,4 +27,13 @@ public class HttpRequest {
     public String getVersion() { return version; }
     public Map<String, String> getHeaders() { return headers; }
 
+    public String getRequiredParam(String key) {
+        String value = queryParams.get(key);
+        if (value == null) {
+            throw new IllegalArgumentException("Missing required query parameter: " + key);
+        }
+        return value;
+    }
+
+
 }

@@ -5,7 +5,6 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import model.User;
 import model.UserHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,18 +22,7 @@ public class WebServer {
             port = Integer.parseInt(args[0]);
         }
 
-        /*
-         * 핸들러 수동 등록
-         * */
-
-        HandlerRegister handlerRegister = new HandlerRegister();
-
-        UserHandler userHandler = new UserHandler(); // 이거 DCL 도 고려해 보자
-
-        // 회원가입
-        handlerRegister.register(HttpMethod.GET, "/create", userHandler, "register", User.class);
-        // 로그인
-        handlerRegister.register(HttpMethod.POST, "/login", userHandler, "login", String.class, String.class);
+        initHandlerMappings();
 
         ExecutorService executor =
                 Executors.newFixedThreadPool(THREAD_POOL_SIZE);
@@ -48,5 +36,16 @@ public class WebServer {
                 executor.execute(new RequestHandler(connection));
             }
         }
+    }
+
+    private static void initHandlerMappings() {
+        HandlerRegister handlerRegister = new HandlerRegister();
+
+        UserHandler userHandler = new UserHandler(); // 이거 DCL 도 고려해 보자
+
+        // 회원가입
+        handlerRegister.register(HttpMethod.GET, "/create", userHandler, "register", HttpRequest.class, HttpResponse.class);
+        // 로그인
+        handlerRegister.register(HttpMethod.POST, "/login", userHandler, "login", HttpRequest.class, HttpResponse.class);
     }
 }

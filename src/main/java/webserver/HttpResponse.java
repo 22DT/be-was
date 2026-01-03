@@ -7,28 +7,18 @@ public class HttpResponse {
 
     private int statusCode;
     private String message;
-    private Map<String, String> headers = new HashMap<>();
+    private final Map<String, String> headers;
     private byte[] body;
 
-    public static HttpResponse ok() {
-        HttpResponse res = new HttpResponse();
-        res.statusCode = 200;
-        res.message = "OK";
-        return res;
+
+    public HttpResponse() {
+        this.statusCode = 200;     // defaultthis.message = "OK";       // default
+        this.headers = new HashMap<>();
     }
 
-    public static HttpResponse notFound() {
-        HttpResponse res = new HttpResponse();
-        res.statusCode = 404;
-        res.message = "Not Found";
-        return res;
-    }
-
-    public static HttpResponse internalServerError() {
-        HttpResponse res = new HttpResponse();
-        res.statusCode = 500;
-        res.message = "Internal Server Error";
-        return res;
+    public void setStatus(int statusCode, String message) {
+        this.statusCode = statusCode;
+        this.message = message;
     }
 
     public void addHeader(String key, String value) {
@@ -45,15 +35,36 @@ public class HttpResponse {
     public int getStatusCode() {
         return statusCode;
     }
+
     public String getMessage() {
         return message;
     }
+
     public Map<String, String> getHeaders() {
         return headers;
     }
+
     public byte[] getBody() {
         return body;
     }
+
+
+    public void ok() {
+        setStatus(200, "OK");
+    }
+
+    public void badRequest() {
+        setStatus(400, "Bad Request");
+    }
+
+    public void notFound() {
+        setStatus(404, "Not Found");
+    }
+
+    public void internalServerError() {
+        setStatus(500, "Internal Server Error");
+    }
 }
+
 
 

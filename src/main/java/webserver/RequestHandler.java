@@ -3,6 +3,7 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +12,7 @@ import org.slf4j.LoggerFactory;
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
-    private Socket connection;
+    private final Socket connection;
 
     private static final String STATIC_DIR = "src/main/resources/static";
 
@@ -28,19 +29,21 @@ public class RequestHandler implements Runnable {
             DataOutputStream dos = new DataOutputStream(out);
 
             /*
-             * request
+             * request response 준비
              * */
 
             HttpRequest request = HttpRequestParser.parse(in);
+            HttpResponse response = new HttpResponse();
 
             // HTTP Request 내용 출력
             logHttpRequest(request);
 
+
             /*
-             * 비즈니스 로직
+             * request 처리
              * */
 
-            HttpResponse response = handleRequest(request);
+            handleRequest(request, response);
 
             /*
              * response
@@ -53,11 +56,18 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private HttpResponse handleRequest(HttpRequest request) {
+    private void handleRequest(HttpRequest request, HttpResponse response) {
+
+        /*
+         * 라우팅 여기서 하자
+         *
+         * 일단, 밑에는 정적 리소스 처리임.
+         * */
+
         String path = request.getPath();
 
-        try {
 
+        try {
             File file = new File(STATIC_DIR + path);
 
             if (file.isDirectory()) {
@@ -67,16 +77,21 @@ public class RequestHandler implements Runnable {
 
             byte[] body = Files.readAllBytes(file.toPath());
 
-            HttpResponse response = HttpResponse.ok();
+            // 의미 초기화
+            response.setStatus(200, "OK");
             response.addHeader("Content-Type", resolveContentType(path));
             response.setBody(body);
 
-            return response;
+        } catch (NoSuchFileException | FileNotFoundException e) {
+            response.setStatus(404, "Not Found");
+            response.setBody("Not Found".getBytes());
 
         } catch (IOException e) {
-            return HttpResponse.internalServerError();
+            response.setStatus(500, "Internal Server Error");
+            response.setBody("Internal Server Error".getBytes());
         }
     }
+
 
     private String resolveContentType(String path) {
         if (path.endsWith(".html")) return "text/html; charset=UTF-8";
