@@ -1,5 +1,7 @@
 package webserver;
 
+import http.HttpMethod;
+
 import java.util.Objects;
 
 public final class HandlerKey {

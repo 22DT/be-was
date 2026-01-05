@@ -3,9 +3,9 @@ package model;
 import db.Database;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import webserver.HttpMethod;
-import webserver.HttpRequest;
-import webserver.HttpResponse;
+import http.HttpMethod;
+import http.HttpRequest;
+import http.HttpResponse;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,16 +20,16 @@ class UserHandlerTest {
     private UserHandler userHandler;
 
     @BeforeEach
-    void suetUp(){
+    void suetUp() {
         userHandler = new UserHandler();
     }
 
 
     @Test
-    void 정상_회원가입(){
+    void 정상_회원가입() {
         /*
-        * given
-        * */
+         * given
+         * */
 
         HttpRequest request = requestWith(
                 "userId", "user1",
@@ -42,15 +42,15 @@ class UserHandlerTest {
 
 
         /*
-        * when
-        * */
+         * when
+         * */
 
         assertDoesNotThrow(() -> userHandler.register(request, response));
 
 
         /*
-        * then
-        * */
+         * then
+         * */
 
         User saved = Database.findUserById("user1");
         assertNotNull(saved);
@@ -59,7 +59,7 @@ class UserHandlerTest {
     }
 
     @Test
-    void 필수_파라미터_누락(){
+    void 필수_파라미터_누락() {
 
         /*
          * given
@@ -85,7 +85,7 @@ class UserHandlerTest {
     }
 
     @Test
-    void 중복_userId_single_thread(){
+    void 중복_userId_single_thread() {
 
         /*
          * given
@@ -131,7 +131,7 @@ class UserHandlerTest {
          * given
          * */
 
-        int threadCount=20;
+        int threadCount = 20;
         ExecutorService executor = Executors.newFixedThreadPool(threadCount);
 
         Runnable task = () -> {
@@ -159,10 +159,10 @@ class UserHandlerTest {
 
 
         /*
-        * 더 이상 새로운 작ㅇ버을 받지 않고
-        * 이미 제출된 모든 작업이 끝날 때까지 기다린다.
-        * 스레드 풀을 정상적으로 종료하지 않으면 테스트가 끝나지 않을 수 있음
-        * */
+         * 더 이상 새로운 작ㅇ버을 받지 않고
+         * 이미 제출된 모든 작업이 끝날 때까지 기다린다.
+         * 스레드 풀을 정상적으로 종료하지 않으면 테스트가 끝나지 않을 수 있음
+         * */
 
         executor.shutdown();
         executor.awaitTermination(3, TimeUnit.SECONDS);
@@ -188,7 +188,8 @@ class UserHandlerTest {
                 "/create",           // path
                 params,              // queryParams
                 "HTTP/1.1",          // version
-                new HashMap<>()       // headers
+                new HashMap<>(),      // headers
+                null
         );
     }
 

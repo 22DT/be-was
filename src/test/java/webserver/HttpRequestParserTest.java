@@ -1,12 +1,17 @@
 package webserver;
 
+import http.HttpRequest;
+import http.HttpRequestParser;
+import model.User;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class HttpRequestParserTest {
 
@@ -86,6 +91,45 @@ class HttpRequestParserTest {
         * */
         assertEquals(1, httpRequest.getQueryParams().size());
         assertEquals("", httpRequest.getQueryParams().get("keyword"));
+    }
+
+
+    @Test
+    void bodyParams를_User객체로_변환한다() throws IOException {
+        /*
+        * given
+        * */
+
+        String body = "userId=kim&password=1234&name=김철수&email=kim@test.com";
+
+        String request =
+                "POST /register HTTP/1.1\r\n" +
+                        "Host: localhost:8080\r\n" +
+                        "Content-Type: application/x-www-form-urlencoded\r\n" +
+                        "Content-Length: " + body.getBytes(StandardCharsets.UTF_8).length + "\r\n" +
+                        "\r\n" +
+                        body;
+
+        /*
+        * when
+        * */
+
+        HttpRequest httpRequest = HttpRequestParser.parse(new ByteArrayInputStream(request.getBytes(StandardCharsets.UTF_8)));
+
+        Map<String, String> params = httpRequest.getBodyParams();
+
+        User user = new User(params.get("userId"), params.get("password"), params.get("name"), params.get("email"));
+
+
+        /*
+         * then
+         */
+
+        assertEquals("kim", user.getUserId());
+        assertEquals("1234", user.getPassword());
+        assertEquals("김철수", user.getName());
+        assertEquals("kim@test.com", user.getEmail());
+
     }
 
 }

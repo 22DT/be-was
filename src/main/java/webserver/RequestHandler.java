@@ -1,5 +1,6 @@
 package webserver;
 
+import http.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.*;
@@ -101,7 +102,7 @@ public class RequestHandler implements Runnable {
             byte[] body = Files.readAllBytes(file.toPath());
 
             response.setStatus(200, "OK");
-            response.addHeader("Content-Type", resolveContentType(path));
+            response.addHeader(HttpHeader.CONTENT_TYPE.value(), resolveContentType(path));
             response.setBody(body);
 
         } catch (IOException e) {

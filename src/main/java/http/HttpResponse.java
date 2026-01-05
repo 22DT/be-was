@@ -1,4 +1,4 @@
-package webserver;
+package http;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +28,7 @@ public class HttpResponse {
     public void setBody(byte[] body) {
         this.body = body;
         if (body != null) {
-            headers.put("Content-Length", String.valueOf(body.length));
+            headers.put(HttpHeader.CONTENT_LENGTH.value(), String.valueOf(body.length));
         }
     }
 

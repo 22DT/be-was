@@ -1,9 +1,10 @@
-package webserver;
+package http;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,6 +64,26 @@ public class HttpRequestParser {
             }
         }
 
-        return new HttpRequest(method, path, queryParams, version, headers);
+        // 4. Body
+        byte[] body = null;
+        String contentLengthValue = headers.get(HttpHeader.CONTENT_LENGTH.value());
+
+        if (contentLengthValue != null && !contentLengthValue.isEmpty()) {
+            int contentLength = Integer.parseInt(contentLengthValue);
+
+            char[] bodyChars = new char[contentLength];
+            int read = 0;
+
+            while (read < contentLength) {
+                int r = reader.read(bodyChars, read, contentLength - read);
+                if (r == -1) break;
+                read += r;
+            }
+
+            body = new String(bodyChars, 0, read).getBytes(StandardCharsets.UTF_8);
+        }
+
+
+        return new HttpRequest(method, path, queryParams, version, headers, body);
     }
 }

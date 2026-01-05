@@ -1,5 +1,7 @@
 package webserver;
 
+import http.HttpMethod;
+
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
