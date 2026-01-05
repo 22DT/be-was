@@ -46,6 +46,10 @@ public class HttpRequest {
         return headers;
     }
 
+    public byte[] getBody() {
+        return this.body;
+    }
+
     public String getRequiredParam(String key) {
         String value = queryParams.get(key);
         if (value == null) {

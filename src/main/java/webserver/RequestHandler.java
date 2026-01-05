@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 public class RequestHandler implements Runnable {
@@ -143,6 +144,16 @@ public class RequestHandler implements Runnable {
                 logger.debug("{}: {}", key, value)
         );
 
+        logger.debug("----- Body -----");
+        byte[] body = request.getBody();
+        if (body == null || body.length == 0) {
+            logger.debug("(none)");
+        } else {
+            String bodyString = new String(body, StandardCharsets.UTF_8);
+            logger.debug(bodyString);
+        }
+
         logger.debug("========================");
     }
+
 }

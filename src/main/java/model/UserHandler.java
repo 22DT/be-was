@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import webserver.WebServer;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 public class UserHandler {
     private static final Logger logger = LoggerFactory.getLogger(WebServer.class);
@@ -17,38 +18,38 @@ public class UserHandler {
         logger.debug("[register]");
 
         /*
-        * request 처리
-        * */
+         * request 처리 (POST: body)
+         */
+        Map<String, String> params = request.getBodyParams();
 
-        String userId = request.getRequiredParam("userId");
-        String password = request.getRequiredParam("password");
-        String name = request.getRequiredParam("name");
-        String email = request.getRequiredParam("email");
+        String userId = params.get("userId");
+        String password = params.get("password");
+        String name = params.get("name");
+        String email = params.get("email");
+
+        if (userId == null || password == null || name == null || email == null) {
+            throw new IllegalArgumentException("필수 회원가입 파라미터 누락");
+        }
 
         User user = new User(userId, password, name, email);
 
-
         /*
-        * 비즈니스 로직
-        * */
-
+         * 비즈니스 로직
+         */
         User prev = Database.addUser(user);
-
         if (prev != null) {
             throw new IllegalArgumentException(
                     "이미 존재하는 userId: " + user.getUserId()
             );
         }
 
-
         /*
-        * response
-        * */
-
-        response.setStatus(201, "Created");
-        response.addHeader("Content-Type", "text/plain; charset=UTF-8");
-        response.setBody("회원가입 성공".getBytes(StandardCharsets.UTF_8));
+         * redirect response
+         */
+        response.setStatus(302, "Found");
+        response.addHeader("Location", "/index.html");
     }
+
 
     public void login(HttpRequest request, HttpResponse response) {
 

@@ -47,9 +47,9 @@ public class WebServer {
         UserHandler userHandler = new UserHandler(); // 이거 DCL 도 고려해 보자
 
         // 회원가입
-        handlerRegister.register(HttpMethod.GET, "/create", userHandler, "register", HttpRequest.class, HttpResponse.class);
+        handlerRegister.register(HttpMethod.POST, "/user/create", userHandler, "register", HttpRequest.class, HttpResponse.class);
         // 로그인
-        handlerRegister.register(HttpMethod.POST, "/login", userHandler, "login", HttpRequest.class, HttpResponse.class);
+        handlerRegister.register(HttpMethod.POST, "/user/login", userHandler, "login", HttpRequest.class, HttpResponse.class);
 
         return handlerRegister;
     }

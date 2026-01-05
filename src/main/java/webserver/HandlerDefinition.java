@@ -21,6 +21,22 @@ public class HandlerDefinition {
         this.target = target;
     }
 
+    public HttpMethod getMethod() {
+        return method;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public Object getHandler() {
+        return handler;
+    }
+
+    public Method getTarget() {
+        return target;
+    }
+
     public void handle(HttpRequest request, HttpResponse response) {
         try {
             target.invoke(handler, request, response);
@@ -37,5 +53,4 @@ public class HandlerDefinition {
             throw new RuntimeException(cause);
         }
     }
-
 }
