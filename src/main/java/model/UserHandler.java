@@ -1,18 +1,20 @@
 package model;
 
 import db.Database;
+import http.HttpHeader;
 import http.HttpRequest;
 import http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import webserver.WebServer;
 
-import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class UserHandler {
     private static final Logger logger = LoggerFactory.getLogger(WebServer.class);
+    private final Map<String, User> sessions = new HashMap<>();
 
     public void register(HttpRequest request, HttpResponse response) {
         logger.debug("[register]");
@@ -47,7 +49,7 @@ public class UserHandler {
          * redirect response
          */
         response.setStatus(302, "Found");
-        response.addHeader("Location", "/index.html");
+        response.addHeader(HttpHeader.LOCATION.value(), "/index.html");
     }
 
 
@@ -57,8 +59,14 @@ public class UserHandler {
         * request
         * */
 
-        String userId=null;
-        String password=null;
+        Map<String, String> bodyParams = request.getBodyParams();
+
+        String userId=bodyParams.get("userId");
+        String password=bodyParams.get("password");
+
+        if (userId == null || password == null) {
+            throw new IllegalArgumentException("필수 회원가입 파라미터 누락");
+        }
 
 
         /*
@@ -78,15 +86,17 @@ public class UserHandler {
         }
 
         // 3. 로그인 성공
-        // (현재는 성공 처리만, 세션/상태 없음)
 
+        // 세션 생성
+        String sessionId = UUID.randomUUID().toString();
+        sessions.put(sessionId, user);
 
         /*
         * response
         * */
 
-        response.setStatus(200, "OK");
-        response.addHeader("Content-Type", "text/plain; charset=UTF-8");
-        response.setBody("로그인 성공".getBytes(StandardCharsets.UTF_8));
+        response.setStatus(302, "Found");
+        response.addHeader(HttpHeader.SET_COOKIE.value(), "SID=" + sessionId + "; Path=/");
+        response.addHeader(HttpHeader.LOCATION.value(), "/index.html");
     }
 }

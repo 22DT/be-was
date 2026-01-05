@@ -80,7 +80,8 @@ public class RequestHandler implements Runnable {
                     request.getMethod(), request.getPath(), e);
 
             response.setStatus(404, "Not Found");
-            response.setBody("Not Found".getBytes());
+            response.addHeader(HttpHeader.CONTENT_TYPE.value(), "text/plain; charset=UTF-8");
+            response.setBody(e.getMessage().getBytes(StandardCharsets.UTF_8));
         }
     }
 
