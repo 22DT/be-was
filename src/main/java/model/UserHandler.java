@@ -45,6 +45,7 @@ public class UserHandler {
         * */
 
         response.setStatus(201, "Created");
+        response.addHeader("Content-Type", "text/plain; charset=UTF-8");
         response.setBody("회원가입 성공".getBytes(StandardCharsets.UTF_8));
     }
 
@@ -81,5 +82,9 @@ public class UserHandler {
         /*
         * response
         * */
+
+        response.setStatus(200, "OK");
+        response.addHeader("Content-Type", "text/plain; charset=UTF-8");
+        response.setBody("로그인 성공".getBytes(StandardCharsets.UTF_8));
     }
 }

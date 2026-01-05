@@ -22,7 +22,7 @@ public class WebServer {
             port = Integer.parseInt(args[0]);
         }
 
-        initHandlerMappings();
+        HandlerRegister handlerRegister = initHandlerMappings();
 
         ExecutorService executor =
                 Executors.newFixedThreadPool(THREAD_POOL_SIZE);
@@ -33,12 +33,12 @@ public class WebServer {
             while (true) {
                 Socket connection = listenSocket.accept();
 
-                executor.execute(new RequestHandler(connection));
+                executor.execute(new RequestHandler(connection, handlerRegister));
             }
         }
     }
 
-    private static void initHandlerMappings() {
+    private static HandlerRegister initHandlerMappings() {
         HandlerRegister handlerRegister = new HandlerRegister();
 
         UserHandler userHandler = new UserHandler(); // 이거 DCL 도 고려해 보자
@@ -47,5 +47,7 @@ public class WebServer {
         handlerRegister.register(HttpMethod.GET, "/create", userHandler, "register", HttpRequest.class, HttpResponse.class);
         // 로그인
         handlerRegister.register(HttpMethod.POST, "/login", userHandler, "login", HttpRequest.class, HttpResponse.class);
+
+        return handlerRegister;
     }
 }

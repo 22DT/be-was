@@ -1,23 +1,22 @@
 package webserver;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     private final Socket connection;
+    private final HandlerRegister handlerRegister;
 
     private static final String STATIC_DIR = "src/main/resources/static";
 
-    public RequestHandler(Socket connectionSocket) {
+    public RequestHandler(Socket connectionSocket, HandlerRegister handlerRegister) {
         this.connection = connectionSocket;
+        this.handlerRegister = handlerRegister;
     }
 
     public void run() {
@@ -57,38 +56,56 @@ public class RequestHandler implements Runnable {
     }
 
     private void handleRequest(HttpRequest request, HttpResponse response) {
+        try {
 
-        /*
-         * 라우팅 여기서 하자
-         *
-         * 일단, 밑에는 정적 리소스 처리임.
-         * */
+            // 라우팅
 
+            HandlerDefinition handler =
+                    handlerRegister.get(request.getMethod(), request.getPath());
+            // 1. 동적 리소스
+            if (handler != null) {
+                handler.handle(request, response);
+            }
+            // 2. 정적 리소스
+            else {
+                handleStatic(request, response);
+            }
+
+        } catch (Exception e) {
+
+            // 동적도 없고 정적도 없음 → 404
+            logger.debug("Request not handled. method={}, path={}",
+                    request.getMethod(), request.getPath(), e);
+
+            response.setStatus(404, "Not Found");
+            response.setBody("Not Found".getBytes());
+        }
+    }
+
+
+    private void handleStatic(HttpRequest request, HttpResponse response) {
         String path = request.getPath();
-
 
         try {
             File file = new File(STATIC_DIR + path);
 
             if (file.isDirectory()) {
+                file = new File(file, "index.html");
                 path = path + "/index.html";
-                file = new File(STATIC_DIR + path);
+            }
+
+            if (!file.exists()) {
+                throw new RuntimeException("Static resource not found: " + path);
             }
 
             byte[] body = Files.readAllBytes(file.toPath());
 
-            // 의미 초기화
             response.setStatus(200, "OK");
             response.addHeader("Content-Type", resolveContentType(path));
             response.setBody(body);
 
-        } catch (NoSuchFileException | FileNotFoundException e) {
-            response.setStatus(404, "Not Found");
-            response.setBody("Not Found".getBytes());
-
         } catch (IOException e) {
-            response.setStatus(500, "Internal Server Error");
-            response.setBody("Internal Server Error".getBytes());
+            throw new RuntimeException(e);
         }
     }
 
@@ -127,5 +144,4 @@ public class RequestHandler implements Runnable {
 
         logger.debug("========================");
     }
-
 }
