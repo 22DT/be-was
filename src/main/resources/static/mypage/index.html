@@ -42,11 +42,12 @@
           <form class="form">
             <div class="textfield textfield_size_s input_margin">
               <p class="title_textfield">닉네임</p>
-              <input
-                class="input_textfield"
-                placeholder="{회원 가입 시 입력했던 닉네임}"
-                autocomplete="username"
-              />
+                <input
+                    class="input_textfield"
+                    name="name"
+                    value="{{USER_NAME}}"
+                    autocomplete="username"
+                />
             </div>
             <div class="textfield textfield_size_s">
               <p class="title_textfield">비밀번호</p>
@@ -68,7 +69,7 @@
             <button
               id="registration-btn"
               class="btn btn_contained btn_size_m input_margin"
-            
+
               type="button"
             >
               변경사항 저장

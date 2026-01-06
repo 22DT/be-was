@@ -8,13 +8,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.WebServer;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 public class UserHandler {
     private static final Logger logger = LoggerFactory.getLogger(WebServer.class);
-    private final Map<String, User> sessions = new HashMap<>();
 
     public void register(HttpRequest request, HttpResponse response) {
         logger.debug("[register]");
@@ -56,13 +53,13 @@ public class UserHandler {
     public void login(HttpRequest request, HttpResponse response) {
 
         /*
-        * request
-        * */
+         * request
+         * */
 
         Map<String, String> bodyParams = request.getBodyParams();
 
-        String userId=bodyParams.get("userId");
-        String password=bodyParams.get("password");
+        String userId = bodyParams.get("userId");
+        String password = bodyParams.get("password");
 
         if (userId == null || password == null) {
             throw new IllegalArgumentException("필수 회원가입 파라미터 누락");
@@ -70,8 +67,8 @@ public class UserHandler {
 
 
         /*
-        * 비즈니스 로직
-        * */
+         * 비즈니스 로직
+         * */
 
         User user = Database.findUserById(userId);
 
@@ -88,12 +85,11 @@ public class UserHandler {
         // 3. 로그인 성공
 
         // 세션 생성
-        String sessionId = UUID.randomUUID().toString();
-        sessions.put(sessionId, user);
+        String sessionId = SessionManager.createSession(user);
 
         /*
-        * response
-        * */
+         * response
+         * */
 
         response.setStatus(302, "Found");
         response.addHeader(HttpHeader.SET_COOKIE.value(), "SID=" + sessionId + "; Path=/");

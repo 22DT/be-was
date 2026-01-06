@@ -88,5 +88,24 @@ public class HttpRequest {
 
     }
 
+    public String getCookie(String name) {
+        String cookieHeader = headers.get(HttpHeader.COOKIE.value());
+
+        if (cookieHeader == null || cookieHeader.isBlank()) {
+            return null;
+        }
+
+        String[] cookies = cookieHeader.split(";");
+        for (String cookie : cookies) {
+            String[] kv = cookie.trim().split("=", 2);
+
+            if (kv.length == 2 && kv[0].equals(name)) {
+                return kv[1];
+            }
+        }
+
+        return null;
+    }
+
 
 }

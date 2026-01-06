@@ -6,10 +6,7 @@ public enum HttpHeader {
     LOCATION("Location"),
     COOKIE("Cookie"),
     SET_COOKIE("Set-Cookie"),
-
-
-
-    ;
+    SESSION_COOKIE_NAME("SID");
 
 
     private final String value;
