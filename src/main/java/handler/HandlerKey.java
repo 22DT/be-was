@@ -1,4 +1,4 @@
-package webserver;
+package handler;
 
 import http.HttpMethod;
 

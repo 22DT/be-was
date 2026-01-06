@@ -1,14 +1,17 @@
-package webserver;
+package handler;
 
 import http.HttpHeader;
+import http.HttpMethod;
 import http.HttpRequest;
 import http.HttpResponse;
 import model.SessionManager;
 import model.User;
+import webserver.HtmlLoader;
 
 import java.nio.charset.StandardCharsets;
 
 public class PageHandler {
+    @HandlerMapping(method= HttpMethod.GET, path="/index.html")
     public void index(HttpRequest request, HttpResponse response) {
         /*
          * 1. 로그인 여부 판단
@@ -68,6 +71,7 @@ public class PageHandler {
         response.setBody(html.getBytes(StandardCharsets.UTF_8));
     }
 
+    @HandlerMapping(method = HttpMethod.GET, path="/mypage")
     public void myPage(HttpRequest request, HttpResponse response){
         /*
         * 1. 세션 확인

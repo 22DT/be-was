@@ -1,7 +1,9 @@
 package model;
 
 import db.Database;
+import handler.HandlerMapping;
 import http.HttpHeader;
+import http.HttpMethod;
 import http.HttpRequest;
 import http.HttpResponse;
 import org.slf4j.Logger;
@@ -13,6 +15,7 @@ import java.util.Map;
 public class UserHandler {
     private static final Logger logger = LoggerFactory.getLogger(WebServer.class);
 
+    @HandlerMapping(method= HttpMethod.POST, path="/user/create")
     public void register(HttpRequest request, HttpResponse response) {
         logger.debug("[register]");
 
@@ -50,6 +53,7 @@ public class UserHandler {
     }
 
 
+    @HandlerMapping(method=HttpMethod.POST, path="/user/login")
     public void login(HttpRequest request, HttpResponse response) {
 
         /*

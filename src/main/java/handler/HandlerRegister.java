@@ -1,6 +1,8 @@
-package webserver;
+package handler;
 
 import http.HttpMethod;
+import http.HttpRequest;
+import http.HttpResponse;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -25,6 +27,29 @@ public class HandlerRegister {
                             handler.getClass().getName() + "#" + methodName,
                     e
             );
+        }
+    }
+
+    public void register(Object handler){
+        Class<?> clazz = handler.getClass();
+
+        for(Method method:clazz.getDeclaredMethods()){
+            HandlerMapping mapping = method.getAnnotation(HandlerMapping.class);
+
+            if(mapping==null){
+                continue;
+            }
+
+            /*
+            * 시그니처 검증 (지금 구조 기준)
+            * */
+            Class<?>[] params = method.getParameterTypes();
+            if(params.length != 2|| params[0] != HttpRequest.class || params[1]!= HttpResponse.class){
+
+                throw new IllegalStateException("Invalid handler method signature: " + method);
+            }
+
+            register(mapping.method(), mapping.path(), handler, method.getName(), HttpRequest.class, HttpResponse.class);
         }
     }
 

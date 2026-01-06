@@ -1,5 +1,7 @@
 package webserver;
 
+import handler.HandlerDefinition;
+import handler.HandlerRegister;
 import http.HttpMethod;
 import http.HttpRequest;
 import http.HttpResponse;
