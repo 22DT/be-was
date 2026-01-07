@@ -1,66 +1,80 @@
 package webserver;
 
 import application.ApplicationDispatcher;
-import http.HttpRequest;
-import http.HttpRequestParser;
-import http.HttpResponse;
-import http.HttpResponseWriter;
+import http.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.Socket;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
-    private final Socket connection;
+    private final BlockingConnection connection;
     private final ApplicationDispatcher appDispatcher;
 
     private static final String STATIC_DIR = "src/main/resources/static";
 
-    public RequestHandler(Socket connectionSocket, ApplicationDispatcher appDispatcher) {
-        this.connection = connectionSocket;
+    public RequestHandler(BlockingConnection connection, ApplicationDispatcher appDispatcher) {
+        this.connection = connection;
         this.appDispatcher = appDispatcher;
     }
 
     public void run() {
-        logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
-                connection.getPort());
 
-        try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
-            DataOutputStream dos = new DataOutputStream(out);
+        Socket socket = connection.getSocket();
 
-            /*
-             * request response 준비
-             * */
+        logger.debug("New Client Connect! Connected IP : {}, Port : {}",
+                socket.getInetAddress(), socket.getPort());
 
-            HttpRequest request = HttpRequestParser.parse(in);
-            HttpResponse response = new HttpResponse();
+        ByteBuffer readBuffer = ByteBuffer.allocate(8192);
 
-            // HTTP Request 내용 출력
-            logHttpRequest(request);
+        try {
+            while (true) {
+                int read = connection.read(readBuffer);
 
+                if (read == -1) {
+                    connection.close();
+                    return;
+                }
 
-            /*
-             * dispatcher 로 넘겨준다.
-             * */
+                // 읽은 데이터 읽기 모드 전환
+                readBuffer.flip();
 
-            appDispatcher.dispatch(request, response);
+                HttpRequest request = HttpRequestParser.parse(readBuffer);
 
-            /*
-             * response
-             * */
+                // 아직 요청이 완성되지 않음 → 다음 read 대기
+                if (request == null) {
+                    readBuffer.compact(); // 남은 데이터 보존
+                    continue;
+                }
 
-            HttpResponseWriter.write(dos, response);
+                // HTTP Request 로그
+                logHttpRequest(request);
+
+                HttpResponse response = new HttpResponse();
+
+                // Application 계층 호출
+                appDispatcher.dispatch(request, response);
+
+                // 응답 쓰기
+                HttpResponseWriter.write(connection, response);
+
+                // keep-alive 미지원 → 1 request 후 종료
+                connection.close();
+                return;
+            }
 
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(), e);
+            try {
+                connection.close();
+            } catch (IOException ex) {
+                logger.error(ex.getMessage(), ex);
+            }
         }
     }
 

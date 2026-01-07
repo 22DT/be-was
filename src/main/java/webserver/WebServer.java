@@ -4,6 +4,7 @@ import application.ApplicationDispatcher;
 import application.StaticResourceHandler;
 import config.HandlerConfig;
 import handler.HandlerRegister;
+import http.BlockingConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +42,9 @@ public class WebServer {
             logger.info("Web Application Server started {} port.", port);
 
             while (true) {
-                Socket connection = listenSocket.accept();
+                Socket socket = listenSocket.accept();
+
+                BlockingConnection connection = new BlockingConnection(socket);
 
                 executor.execute(new RequestHandler(connection, appDispatcher));
             }
