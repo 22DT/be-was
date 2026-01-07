@@ -1,5 +1,7 @@
 package webserver;
 
+import application.ApplicationDispatcher;
+import application.StaticResourceHandler;
 import config.HandlerConfig;
 import handler.HandlerRegister;
 import org.slf4j.Logger;
@@ -23,7 +25,14 @@ public class WebServer {
             port = Integer.parseInt(args[0]);
         }
 
+
+        /*
+         * 애플리케이션 뜨기 위해 필요한 객체 들이 있네.. 이런 거 등록 흠..
+         * */
+
         HandlerRegister handlerRegister = HandlerConfig.initializeWithAnnotations();
+        StaticResourceHandler staticResourceHandler = new StaticResourceHandler();
+        ApplicationDispatcher appDispatcher = new ApplicationDispatcher(handlerRegister, staticResourceHandler);
 
         ExecutorService executor =
                 Executors.newFixedThreadPool(THREAD_POOL_SIZE);
@@ -34,7 +43,7 @@ public class WebServer {
             while (true) {
                 Socket connection = listenSocket.accept();
 
-                executor.execute(new RequestHandler(connection, handlerRegister));
+                executor.execute(new RequestHandler(connection, appDispatcher));
             }
         }
     }

@@ -1,26 +1,31 @@
 package webserver;
 
-import handler.HandlerDefinition;
-import handler.HandlerRegister;
-import http.*;
+import application.ApplicationDispatcher;
+import http.HttpRequest;
+import http.HttpRequestParser;
+import http.HttpResponse;
+import http.HttpResponseWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.io.*;
+
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     private final Socket connection;
-    private final HandlerRegister handlerRegister;
+    private final ApplicationDispatcher appDispatcher;
 
     private static final String STATIC_DIR = "src/main/resources/static";
 
-    public RequestHandler(Socket connectionSocket, HandlerRegister handlerRegister) {
+    public RequestHandler(Socket connectionSocket, ApplicationDispatcher appDispatcher) {
         this.connection = connectionSocket;
-        this.handlerRegister = handlerRegister;
+        this.appDispatcher = appDispatcher;
     }
 
     public void run() {
@@ -43,10 +48,10 @@ public class RequestHandler implements Runnable {
 
 
             /*
-             * request 처리
+             * dispatcher 로 넘겨준다.
              * */
 
-            handleRequest(request, response);
+            appDispatcher.dispatch(request, response);
 
             /*
              * response
@@ -57,73 +62,6 @@ public class RequestHandler implements Runnable {
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
-    }
-
-    private void handleRequest(HttpRequest request, HttpResponse response) {
-        try {
-
-            // 라우팅
-
-            HandlerDefinition handler =
-                    handlerRegister.get(request.getMethod(), request.getPath());
-            // 1. 동적 리소스
-            if (handler != null) {
-                handler.handle(request, response);
-            }
-            // 2. 정적 리소스
-            else {
-                handleStatic(request, response);
-            }
-
-        } catch (Exception e) {
-
-            // 동적도 없고 정적도 없음 → 404
-            logger.debug("Request not handled. method={}, path={}",
-                    request.getMethod(), request.getPath(), e);
-
-            response.setStatus(404, "Not Found");
-            response.addHeader(HttpHeader.CONTENT_TYPE.value(), "text/plain; charset=UTF-8");
-            response.setBody(e.getMessage().getBytes(StandardCharsets.UTF_8));
-        }
-    }
-
-
-    private void handleStatic(HttpRequest request, HttpResponse response) {
-        String path = request.getPath();
-
-        try {
-            File file = new File(STATIC_DIR + path);
-
-            if (file.isDirectory()) {
-                file = new File(file, "index.html");
-                path = path + "/index.html";
-            }
-
-            if (!file.exists()) {
-                throw new RuntimeException("Static resource not found: " + path);
-            }
-
-            byte[] body = Files.readAllBytes(file.toPath());
-
-            response.setStatus(200, "OK");
-            response.addHeader(HttpHeader.CONTENT_TYPE.value(), resolveContentType(path));
-            response.setBody(body);
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-
-    private String resolveContentType(String path) {
-        if (path.endsWith(".html")) return "text/html; charset=UTF-8";
-        if (path.endsWith(".css")) return "text/css; charset=UTF-8";
-        if (path.endsWith(".js")) return "application/javascript; charset=UTF-8";
-        if (path.endsWith(".svg")) return "image/svg+xml";
-        if (path.endsWith("ico")) return "image/x-icon";
-        if (path.endsWith(".png")) return "image/png";
-        if (path.endsWith(".jpg") || path.endsWith(".jpeg")) return "image/jpeg";
-        return "application/octet-stream";
     }
 
     private void logHttpRequest(HttpRequest request) {
