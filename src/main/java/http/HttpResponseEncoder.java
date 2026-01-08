@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-public class HttpResponseWriter {
+public class HttpResponseEncoder {
     private static final byte[] CRLF = "\r\n".getBytes(StandardCharsets.US_ASCII);
 
     public static void write(DataOutputStream dos, HttpResponse response) {
@@ -89,6 +89,24 @@ public class HttpResponseWriter {
     private static void putAscii(ByteBuffer buffer, String s) {
         buffer.put(s.getBytes(StandardCharsets.US_ASCII));
     }
+
+    public static ByteBuffer encodeHeaders(HttpResponse res) {
+        ByteBuffer buffer = ByteBuffer.allocate(4096);
+
+        writeStatusLine(buffer, res);
+        writeHeaders(buffer, res);
+
+        buffer.flip();
+        return buffer;
+    }
+
+    public static ByteBuffer encodeBody(HttpResponse res) {
+        if (res.getBody() == null || res.getBody().length == 0) {
+            return null;
+        }
+        return ByteBuffer.wrap(res.getBody());
+    }
+
 }
 
 

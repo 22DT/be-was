@@ -4,7 +4,7 @@ import application.ApplicationDispatcher;
 import http.HttpRequest;
 import http.HttpRequestParser;
 import http.HttpResponse;
-import http.HttpResponseWriter;
+import http.HttpResponseEncoder;
 import network.BlockingConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +63,13 @@ public class ConnectionHandler implements Runnable {
                 appDispatcher.dispatch(request, response);
 
                 // 응답 쓰기
-                HttpResponseWriter.write(connection, response);
+                ByteBuffer headerBuf = HttpResponseEncoder.encodeHeaders(response);
+                connection.write(headerBuf);
+
+                ByteBuffer bodyBuf = HttpResponseEncoder.encodeBody(response);
+                if (bodyBuf != null) {
+                    connection.write(bodyBuf);
+                }
 
                 // keep-alive 미지원 → 1 request 후 종료
                 connection.close();

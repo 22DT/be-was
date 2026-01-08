@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class HttpResponseWriterTest {
+class HttpResponseEncoderTest {
 
     @Test
     void write_ok_response_with_body() throws Exception {
@@ -26,7 +26,7 @@ class HttpResponseWriterTest {
         /*
          * when
          * */
-        HttpResponseWriter.write(connection, response);
+        HttpResponseEncoder.write(connection, response);
 
         /*
          * then
@@ -60,7 +60,7 @@ class HttpResponseWriterTest {
         /*
          * when
          * */
-        HttpResponseWriter.write(connection, response);
+        HttpResponseEncoder.write(connection, response);
 
         /*
          * then
