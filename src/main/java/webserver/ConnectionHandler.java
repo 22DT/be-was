@@ -1,7 +1,11 @@
 package webserver;
 
 import application.ApplicationDispatcher;
-import http.*;
+import http.HttpRequest;
+import http.HttpRequestParser;
+import http.HttpResponse;
+import http.HttpResponseWriter;
+import network.BlockingConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,15 +14,13 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
-public class RequestHandler implements Runnable {
-    private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
+public class ConnectionHandler implements Runnable {
+    private static final Logger logger = LoggerFactory.getLogger(ConnectionHandler.class);
 
     private final BlockingConnection connection;
     private final ApplicationDispatcher appDispatcher;
 
-    private static final String STATIC_DIR = "src/main/resources/static";
-
-    public RequestHandler(BlockingConnection connection, ApplicationDispatcher appDispatcher) {
+    public ConnectionHandler(BlockingConnection connection, ApplicationDispatcher appDispatcher) {
         this.connection = connection;
         this.appDispatcher = appDispatcher;
     }

@@ -4,7 +4,7 @@ import application.ApplicationDispatcher;
 import application.StaticResourceHandler;
 import config.HandlerConfig;
 import handler.HandlerRegister;
-import http.BlockingConnection;
+import network.BlockingConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +46,7 @@ public class WebServer {
 
                 BlockingConnection connection = new BlockingConnection(socket);
 
-                executor.execute(new RequestHandler(connection, appDispatcher));
+                executor.execute(new ConnectionHandler(connection, appDispatcher));
             }
         }
     }

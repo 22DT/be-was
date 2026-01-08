@@ -1,5 +1,7 @@
 package http;
 
+import network.Connection;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
