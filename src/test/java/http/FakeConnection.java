@@ -1,6 +1,6 @@
 package http;
 
-import dragon_tiger.network.Connection;
+import myapp.network.Connection;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;

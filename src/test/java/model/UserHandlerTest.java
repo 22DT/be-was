@@ -1,11 +1,11 @@
 package model;
 
-import dragon_tiger.db.Database;
-import dragon_tiger.http.HttpMethod;
-import dragon_tiger.http.HttpRequest;
-import dragon_tiger.http.HttpResponse;
-import dragon_tiger.model.User;
-import dragon_tiger.model.UserHandler;
+import myapp.db.Database;
+import myapp.http.HttpMethod;
+import myapp.http.HttpRequest;
+import myapp.http.HttpResponse;
+import myapp.model.User;
+import myapp.model.UserHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

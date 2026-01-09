@@ -1,9 +1,9 @@
 package webserver;
 
-import dragon_tiger.http.HttpMethod;
-import dragon_tiger.http.HttpRequest;
-import dragon_tiger.http.HttpRequestParser;
-import dragon_tiger.model.User;
+import myapp.http.HttpMethod;
+import myapp.http.HttpRequest;
+import myapp.http.HttpRequestParser;
+import myapp.model.User;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;

@@ -1,11 +1,11 @@
 package bean;
 
-import dragon_tiger.application.PageHandler;
-import dragon_tiger.application.StaticResourceHandler;
-import dragon_tiger.bean.BeanDefinition;
-import dragon_tiger.bean.BeanDefinitionRegistry;
-import dragon_tiger.bean.BeanDefinitionScanner;
-import dragon_tiger.model.UserHandler;
+import myapp.application.PageHandler;
+import myapp.application.StaticResourceHandler;
+import myapp.bean.BeanDefinition;
+import myapp.bean.BeanDefinitionRegistry;
+import myapp.bean.BeanDefinitionScanner;
+import myapp.model.UserHandler;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
@@ -57,7 +57,7 @@ class BeanDefinitionScannerTest {
         /*
          * when
          * */
-        scanner.scan("dragon_tiger");
+        scanner.scan("myapp");
 
         /*
          * then

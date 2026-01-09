@@ -1,7 +1,7 @@
 package http;
 
-import dragon_tiger.http.HttpResponse;
-import dragon_tiger.http.HttpResponseEncoder;
+import myapp.http.HttpResponse;
+import myapp.http.HttpResponseEncoder;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;

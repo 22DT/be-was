@@ -1,11 +1,11 @@
 package webserver;
 
-import dragon_tiger.handler.HandlerDefinition;
-import dragon_tiger.handler.HandlerRegister;
-import dragon_tiger.http.HttpMethod;
-import dragon_tiger.http.HttpRequest;
-import dragon_tiger.http.HttpResponse;
-import dragon_tiger.model.UserHandler;
+import myapp.handler.HandlerDefinition;
+import myapp.handler.HandlerRegister;
+import myapp.http.HttpMethod;
+import myapp.http.HttpRequest;
+import myapp.http.HttpResponse;
+import myapp.model.UserHandler;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
