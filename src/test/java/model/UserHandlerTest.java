@@ -1,11 +1,13 @@
 package model;
 
-import db.Database;
+import dragon_tiger.db.Database;
+import dragon_tiger.http.HttpMethod;
+import dragon_tiger.http.HttpRequest;
+import dragon_tiger.http.HttpResponse;
+import dragon_tiger.model.User;
+import dragon_tiger.model.UserHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import http.HttpMethod;
-import http.HttpRequest;
-import http.HttpResponse;
 
 import java.util.HashMap;
 import java.util.Map;

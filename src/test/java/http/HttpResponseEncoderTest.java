@@ -1,5 +1,7 @@
 package http;
 
+import dragon_tiger.http.HttpResponse;
+import dragon_tiger.http.HttpResponseEncoder;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
@@ -49,8 +51,8 @@ class HttpResponseEncoderTest {
     void write_not_found_without_body() throws Exception {
 
         /*
-        * given
-        * */
+         * given
+         * */
 
         HttpResponse response = new HttpResponse();
         response.notFound();
@@ -76,8 +78,6 @@ class HttpResponseEncoderTest {
                 actual
         );
     }
-
-
 
 
 }

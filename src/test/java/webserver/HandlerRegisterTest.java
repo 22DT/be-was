@@ -1,14 +1,15 @@
 package webserver;
 
-import handler.HandlerDefinition;
-import handler.HandlerRegister;
-import http.HttpMethod;
-import http.HttpRequest;
-import http.HttpResponse;
-import model.UserHandler;
+import dragon_tiger.handler.HandlerDefinition;
+import dragon_tiger.handler.HandlerRegister;
+import dragon_tiger.http.HttpMethod;
+import dragon_tiger.http.HttpRequest;
+import dragon_tiger.http.HttpResponse;
+import dragon_tiger.model.UserHandler;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class HandlerRegisterTest {
 

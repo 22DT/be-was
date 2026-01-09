@@ -1,6 +1,6 @@
 package http;
 
-import network.Connection;
+import dragon_tiger.network.Connection;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
@@ -24,7 +24,8 @@ class FakeConnection implements Connection {
     }
 
     @Override
-    public void close() {}
+    public void close() {
+    }
 
     public byte[] getWrittenBytes() {
         return out.toByteArray();

@@ -1,32 +1,34 @@
 package webserver;
 
+import dragon_tiger.webserver.HtmlLoader;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class HtmlLoaderTest {
 
 
     @Test
-    void load_test_html_success(){
+    void load_test_html_success() {
         /*
-        * given
-        * */
+         * given
+         * */
 
 
-        String path="/test.html";
+        String path = "/test.html";
 
 
         /*
-        * when
-        * */
+         * when
+         * */
 
         String html = HtmlLoader.load(path);
 
 
         /*
-        * then
-        * */
+         * then
+         * */
         assertNotNull(html);
         assertTrue(html.contains("Hello"));
         assertTrue(html.contains("<html>"));
