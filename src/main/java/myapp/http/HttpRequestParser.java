@@ -7,9 +7,11 @@ import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class HttpRequestParser {
+    static final int MAX_BODY_SIZE = 1 * 1024 * 1024;
 
     public static HttpRequest parse(InputStream in) throws IOException {
 
@@ -100,10 +102,24 @@ public class HttpRequestParser {
             return null;
         }
 
+        // /CR / LF 가 라인 내부에 있으면 즉시 거부
+        if (requestLine.indexOf('\r') != -1 || requestLine.indexOf('\n') != -1) {
+            throw new IllegalArgumentException("Invalid CR/LF in request line");
+        }
+
+        // SP는 정확히 2개여야 함
+        long count = requestLine.chars().filter((c) -> c == ' ').count();
+
+        if (count != 2) {
+            throw new IllegalArgumentException("Invalid HTTP request line: expected exactly 2 spaces, found " + count);
+        }
+
         String[] parts = requestLine.split(" ");
         if (parts.length != 3) {
-            throw new IllegalArgumentException("Invalid HTTP request line");
+            throw new IllegalArgumentException("Invalid HTTP request line: expected 3 parts separated by single spaces, found " + parts.length);
         }
+
+        // method
 
         HttpMethod method = HttpMethod.of(parts[0]);
         if (method == null) {
@@ -111,12 +127,9 @@ public class HttpRequestParser {
         }
 
         String url = parts[1];
-        String version = parts[2];
 
 
-        /*
-         * 2. URL -> path / query
-         * */
+        // url
 
         String[] urlParts = url.split("\\?", 2);
         String path = urlParts[0];
@@ -131,40 +144,71 @@ public class HttpRequestParser {
             }
         }
 
+        // HTTP-Version 검증
+        String version = parts[2];
+
+        if (!version.matches("HTTP/\\d\\.\\d")) {
+            throw new IllegalArgumentException("Invalid HTTP version: " + version);
+        }
 
         /*
-         * 3. Headers
+         * 2. Headers
          * */
 
         Map<String, String> headers = new HashMap<>();
-        String line;
 
         while (true) {
-            line = readLine(buffer);
+            String line = readLine(buffer);
             if (line == null) {
                 buffer.reset();
                 return null;
             }
-            if (line.isEmpty()) break;
+
+            // 빈 줄 → 헤더 종료
+            if (line.isEmpty()) {
+                break;
+            }
+
+            // CR/LF 내부 금지
+            if (line.indexOf('\r') != -1 || line.indexOf('\n') != -1) {
+                throw new IllegalArgumentException("Invalid CR/LF in header");
+            }
 
             int idx = line.indexOf(':');
-            if (idx > 0) {
-                headers.put(
-                        line.substring(0, idx).trim(),
-                        line.substring(idx + 1).trim()
-                );
+            if (idx <= 0) {
+                throw new IllegalArgumentException("Invalid header field: " + line);
             }
+
+            String name = line.substring(0, idx);
+            String value = line.substring(idx + 1);
+
+            // 대소문자 무시를 위한 정규화
+            name = name.toLowerCase(Locale.ROOT);
+            value = value.trim();
+
+            headers.put(name, value);
         }
 
+
         /*
-         * 4. Body
+         * 3. Body
          * */
 
         byte[] body = null;
-        String cl = headers.get(HttpHeader.CONTENT_LENGTH.value());
+        String cl = headers.get(HttpHeader.CONTENT_LENGTH.lower());
 
         if (cl != null && !cl.isEmpty()) {
-            int contentLength = Integer.parseInt(cl);
+            int contentLength;
+
+            try {
+                contentLength = Integer.parseInt(cl);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Invalid Content-Length");
+            }
+
+            if (contentLength < 0 || contentLength > MAX_BODY_SIZE) {
+                throw new IllegalArgumentException("Invalid Content-Length");
+            }
 
             if (buffer.remaining() < contentLength) {
                 buffer.reset();

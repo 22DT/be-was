@@ -59,10 +59,10 @@ public class HttpRequest {
     }
 
     public Map<String, String> getBodyParams() {
-        String contentType = headers.get(HttpHeader.CONTENT_TYPE.value());
+        String contentType = headers.get(HttpHeader.CONTENT_TYPE.lower());
 
         if (contentType == null ||
-                !contentType.startsWith("myapp/application/x-www-form-urlencoded")) {
+                !contentType.startsWith("application/x-www-form-urlencoded")) {
             return Map.of();
         }
 
@@ -89,7 +89,7 @@ public class HttpRequest {
     }
 
     public String getCookie(String name) {
-        String cookieHeader = headers.get(HttpHeader.COOKIE.value());
+        String cookieHeader = headers.get(HttpHeader.COOKIE.lower());
 
         if (cookieHeader == null || cookieHeader.isBlank()) {
             return null;

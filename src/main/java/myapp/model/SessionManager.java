@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class SessionManager {
     private static final Map<String, User> sessions = new ConcurrentHashMap<>();
-
+    public static final String SESSION_COOKIE_NAME = "SID";
 
     public static String createSession(User user) {
         String sessionId = UUID.randomUUID().toString();

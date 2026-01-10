@@ -31,7 +31,8 @@ public class UserHandler {
         String name = params.get("name");
         String email = params.get("email");
 
-        if (userId == null || password == null || name == null || email == null) {
+        if (userId == null || userId.isBlank() || password == null || password.isBlank()
+                || name == null || name.isBlank() || email == null || email.isBlank()) {
             throw new IllegalArgumentException("필수 회원가입 파라미터 누락");
         }
 
@@ -67,7 +68,7 @@ public class UserHandler {
         String userId = bodyParams.get("userId");
         String password = bodyParams.get("password");
 
-        if (userId == null || password == null) {
+        if (userId == null || userId.isBlank() || password == null || password.isBlank()) {
             throw new IllegalArgumentException("필수 회원가입 파라미터 누락");
         }
 

@@ -20,7 +20,7 @@ public class PageHandler {
          * 1. 로그인 여부 판단
          * */
 
-        String sessionId = request.getCookie(HttpHeader.SESSION_COOKIE_NAME.value());
+        String sessionId = request.getCookie(SessionManager.SESSION_COOKIE_NAME);
         User user = SessionManager.getLoginUser(sessionId);
 
 
@@ -79,7 +79,7 @@ public class PageHandler {
         /*
          * 1. 세션 확인
          * */
-        String sessionId = request.getCookie(HttpHeader.SESSION_COOKIE_NAME.value());
+        String sessionId = request.getCookie(SessionManager.SESSION_COOKIE_NAME);
         User user = SessionManager.getLoginUser(sessionId);
 
         /*
