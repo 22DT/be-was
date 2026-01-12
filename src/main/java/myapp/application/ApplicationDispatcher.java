@@ -16,7 +16,7 @@ public class ApplicationDispatcher {
     }
 
     public void dispatch(HttpRequest request, HttpResponse response) {
-        HandlerDefinition handler = handlerRegister.get(request.getMethod(), request.getPath());
+        HandlerDefinition handler = handlerRegister.findHandler(request);
 
         if (handler != null) {
             handler.handle(request, response);

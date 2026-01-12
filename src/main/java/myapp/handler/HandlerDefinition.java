@@ -10,23 +10,17 @@ import java.lang.reflect.Method;
 public class HandlerDefinition {
 
     private final HttpMethod method;
-    private final String path;
     private final Object handler;
     private final Method target;
 
-    public HandlerDefinition(HttpMethod method, String path, Object handler, Method target) {
+    public HandlerDefinition(HttpMethod method, Object handler, Method target) {
         this.method = method;
-        this.path = path;
         this.handler = handler;
         this.target = target;
     }
 
     public HttpMethod getMethod() {
         return method;
-    }
-
-    public String getPath() {
-        return path;
     }
 
     public Object getHandler() {

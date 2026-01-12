@@ -11,6 +11,7 @@ public class HttpRequest {
     private final String version;
     private final Map<String, String> headers;
     private final byte[] body;
+    private Map<String, String> pathVariables = new HashMap<>();
 
     public HttpRequest(HttpMethod method,
                        String path,
@@ -105,6 +106,14 @@ public class HttpRequest {
         }
 
         return null;
+    }
+
+    public void setPathVariables(Map<String, String> vars) {
+        this.pathVariables = vars;
+    }
+
+    public String getPathVariable(String name) {
+        return pathVariables.get(name);
     }
 
 

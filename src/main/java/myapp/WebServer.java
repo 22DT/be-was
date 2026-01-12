@@ -32,7 +32,7 @@ public class WebServer {
          * 애플리케이션 뜨기 위해 필요한 객체 들이 있네.. 이런 거 등록 흠..
          * */
 
-        HandlerRegister handlerRegister = HandlerConfig.initializeWithAnnotations();
+        HandlerRegister handlerRegister = HandlerConfig.initialize();
         StaticResourceHandler staticResourceHandler = new StaticResourceHandler();
         ApplicationDispatcher appDispatcher = new ApplicationDispatcher(handlerRegister, staticResourceHandler);
 
