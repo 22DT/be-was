@@ -6,8 +6,8 @@ import myapp.http.HttpHeader;
 import myapp.http.HttpMethod;
 import myapp.http.HttpRequest;
 import myapp.http.HttpResponse;
-import myapp.model.SessionManager;
-import myapp.model.User;
+import myapp.user.SessionManager;
+import myapp.user.User;
 import myapp.webserver.HtmlLoader;
 
 import java.nio.charset.StandardCharsets;
@@ -28,7 +28,7 @@ public class PageHandler {
          * 2. index.html 읽기
          * */
 
-        String html = HtmlLoader.load("/index.html");
+        String html = HtmlLoader.loadStatic("/index.html");
 
 
         /*
@@ -96,7 +96,7 @@ public class PageHandler {
          * 3. mypage.html 읽기
          * */
 
-        String html = HtmlLoader.load("/mypage/index.html");
+        String html = HtmlLoader.loadStatic("/mypage/index.html");
 
         /*
          * 4. 사용자 정보로 html 가공
@@ -107,6 +107,34 @@ public class PageHandler {
         /*
          * 5. 응답
          * */
+
+        response.setStatus(200, "OK");
+        response.addHeader(HttpHeader.CONTENT_TYPE.value(), "text/html; charset=UTF-8");
+        response.setBody(html.getBytes(StandardCharsets.UTF_8));
+    }
+
+
+    @HandlerMapping(method = HttpMethod.GET, path = "/article/index.html")
+    public void redirectToWriteOrLogin(HttpRequest request, HttpResponse response) {
+        /*
+         * 로그인 여부 확인
+         * */
+
+        String sessionId = request.getCookie(SessionManager.SESSION_COOKIE_NAME);
+        User user = SessionManager.getLoginUser(sessionId);
+
+        // 로그인 페이지로 redirect
+        if (user == null) {
+            response.setStatus(302, "Found");
+            response.addHeader(HttpHeader.LOCATION.value(), "/login");
+
+            return;
+        }
+
+
+        String path = request.getPath();
+
+        String html = HtmlLoader.loadStatic(path);
 
         response.setStatus(200, "OK");
         response.addHeader(HttpHeader.CONTENT_TYPE.value(), "text/html; charset=UTF-8");

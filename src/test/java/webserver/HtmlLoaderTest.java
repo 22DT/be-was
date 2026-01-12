@@ -10,7 +10,7 @@ class HtmlLoaderTest {
 
 
     @Test
-    void load_test_html_success() {
+    void load_Static_test_html_success() {
         /*
          * given
          * */
@@ -23,7 +23,7 @@ class HtmlLoaderTest {
          * when
          * */
 
-        String html = HtmlLoader.load(path);
+        String html = HtmlLoader.loadStatic(path);
 
 
         /*
@@ -37,7 +37,7 @@ class HtmlLoaderTest {
 
     @Test
     void print_html() {
-        String html = HtmlLoader.load("/test.html");
+        String html = HtmlLoader.loadStatic("/test.html");
 
         System.out.println("===== HTML START =====");
         System.out.println(html);

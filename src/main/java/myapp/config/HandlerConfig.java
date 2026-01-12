@@ -1,8 +1,9 @@
 package myapp.config;
 
 import myapp.application.PageHandler;
+import myapp.article.ArticleHandler;
 import myapp.handler.HandlerRegister;
-import myapp.model.UserHandler;
+import myapp.user.UserHandler;
 
 public class HandlerConfig {
     public static HandlerRegister initialize() {
@@ -13,12 +14,14 @@ public class HandlerConfig {
          */
         UserHandler userHandler = new UserHandler();
         PageHandler pageHandler = new PageHandler();
+        ArticleHandler articleHandler = new ArticleHandler();
 
         /*
          * 어노테이션 기반 등록
          */
         handlerRegister.register(userHandler);
         handlerRegister.register(pageHandler);
+        handlerRegister.register(articleHandler);
 
         return handlerRegister;
     }

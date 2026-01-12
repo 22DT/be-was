@@ -3,7 +3,7 @@ package webserver;
 import myapp.http.HttpMethod;
 import myapp.http.HttpRequest;
 import myapp.http.HttpRequestParser;
-import myapp.model.User;
+import myapp.user.User;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;

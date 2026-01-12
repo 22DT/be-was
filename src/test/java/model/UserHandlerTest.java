@@ -1,11 +1,11 @@
 package model;
 
-import myapp.db.Database;
+import myapp.db.UserDatabase;
 import myapp.http.HttpMethod;
 import myapp.http.HttpRequest;
 import myapp.http.HttpResponse;
-import myapp.model.User;
-import myapp.model.UserHandler;
+import myapp.user.User;
+import myapp.user.UserHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -54,7 +54,7 @@ class UserHandlerTest {
          * then
          * */
 
-        User saved = Database.findUserById("user1");
+        User saved = UserDatabase.findUserById("user1");
         assertNotNull(saved);
         assertEquals("user1", saved.getUserId());
 
@@ -82,7 +82,7 @@ class UserHandlerTest {
         assertThrows(IllegalArgumentException.class,
                 () -> userHandler.register(request, response));
 
-        assertNull(Database.findUserById("user1"));
+        assertNull(UserDatabase.findUserById("user1"));
 
     }
 
@@ -121,7 +121,7 @@ class UserHandlerTest {
         assertThrows(IllegalArgumentException.class,
                 () -> userHandler.register(request2, new HttpResponse()));
 
-        assertEquals(1, Database.findAll().size());
+        assertEquals(1, UserDatabase.findAll().size());
 
     }
 
@@ -174,7 +174,7 @@ class UserHandlerTest {
          * then
          * */
 
-        assertEquals(1, Database.findAll().size());
+        assertEquals(1, UserDatabase.findAll().size());
 
     }
 

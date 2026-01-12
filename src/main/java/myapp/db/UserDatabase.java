@@ -1,12 +1,12 @@
 package myapp.db;
 
-import myapp.model.User;
+import myapp.user.User;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class Database {
+public class UserDatabase {
     private static Map<String, User> users = new ConcurrentHashMap<>();
 
     public static User addUser(User user) {

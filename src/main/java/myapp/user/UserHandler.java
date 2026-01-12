@@ -1,8 +1,8 @@
-package myapp.model;
+package myapp.user;
 
 import myapp.WebServer;
 import myapp.bean.Component;
-import myapp.db.Database;
+import myapp.db.UserDatabase;
 import myapp.handler.HandlerMapping;
 import myapp.http.HttpHeader;
 import myapp.http.HttpMethod;
@@ -41,7 +41,7 @@ public class UserHandler {
         /*
          * 비즈니스 로직
          */
-        User prev = Database.addUser(user);
+        User prev = UserDatabase.addUser(user);
         if (prev != null) {
             throw new IllegalArgumentException(
                     "이미 존재하는 userId: " + user.getUserId()
@@ -77,7 +77,7 @@ public class UserHandler {
          * 비즈니스 로직
          * */
 
-        User user = Database.findUserById(userId);
+        User user = UserDatabase.findUserById(userId);
 
         // 1. 아이디 없음
         if (user == null) {

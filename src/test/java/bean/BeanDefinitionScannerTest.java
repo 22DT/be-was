@@ -5,7 +5,7 @@ import myapp.application.StaticResourceHandler;
 import myapp.bean.BeanDefinition;
 import myapp.bean.BeanDefinitionRegistry;
 import myapp.bean.BeanDefinitionScanner;
-import myapp.model.UserHandler;
+import myapp.user.UserHandler;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
