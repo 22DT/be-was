@@ -1,7 +1,5 @@
-package myapp.db;
+package myapp.article;
 
-
-import myapp.article.Article;
 
 import java.util.Collection;
 import java.util.Map;

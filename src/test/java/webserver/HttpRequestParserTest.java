@@ -22,7 +22,7 @@ class HttpRequestParserTest {
          * given
          * */
         String request =
-                "GET /index.html HTTP/1.1\r\n" +
+                "GET /write.html HTTP/1.1\r\n" +
                         "Host: localhost:8080\r\n" +
                         "\r\n";
 
@@ -37,7 +37,7 @@ class HttpRequestParserTest {
          * then
          * */
 
-        assertEquals("/index.html", httpRequest.getPath());
+        assertEquals("/write.html", httpRequest.getPath());
         assertTrue(httpRequest.getQueryParams().isEmpty());
     }
 

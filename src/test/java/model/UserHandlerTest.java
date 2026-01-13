@@ -1,10 +1,10 @@
 package model;
 
-import myapp.db.UserDatabase;
 import myapp.http.HttpMethod;
 import myapp.http.HttpRequest;
 import myapp.http.HttpResponse;
 import myapp.user.User;
+import myapp.user.UserDatabase;
 import myapp.user.UserHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

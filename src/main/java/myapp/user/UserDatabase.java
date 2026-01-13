@@ -1,6 +1,4 @@
-package myapp.db;
-
-import myapp.user.User;
+package myapp.user;
 
 import java.util.Collection;
 import java.util.Map;

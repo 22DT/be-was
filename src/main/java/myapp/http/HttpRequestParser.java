@@ -189,6 +189,7 @@ public class HttpRequestParser {
             headers.put(name, value);
         }
 
+        buffer.mark(); // body 시작 위치
 
         /*
          * 3. Body
@@ -211,6 +212,7 @@ public class HttpRequestParser {
             }
 
             if (buffer.remaining() < contentLength) {
+                System.out.println("뭔데?");
                 buffer.reset();
                 return null;
             }
@@ -222,6 +224,109 @@ public class HttpRequestParser {
         return new HttpRequest(
                 method, path, queryParams, version, headers, body
         );
+    }
+
+
+    public static HttpRequest parseHeader(ByteBuffer buffer) {
+        buffer.mark();
+
+        /*
+         * 1. Request Line
+         * */
+        String requestLine = readLine(buffer);
+        if (requestLine == null) {
+            buffer.reset();
+            return null;
+        }
+
+        // /CR / LF 가 라인 내부에 있으면 즉시 거부
+        if (requestLine.indexOf('\r') != -1 || requestLine.indexOf('\n') != -1) {
+            throw new IllegalArgumentException("Invalid CR/LF in request line");
+        }
+
+        // SP는 정확히 2개여야 함
+        long count = requestLine.chars().filter((c) -> c == ' ').count();
+
+        if (count != 2) {
+            throw new IllegalArgumentException("Invalid HTTP request line: expected exactly 2 spaces, found " + count);
+        }
+
+        String[] parts = requestLine.split(" ");
+        if (parts.length != 3) {
+            throw new IllegalArgumentException("Invalid HTTP request line: expected 3 parts separated by single spaces, found " + parts.length);
+        }
+
+        // method
+
+        HttpMethod method = HttpMethod.of(parts[0]);
+        if (method == null) {
+            throw new IllegalArgumentException("Unsupported HTTP method: " + parts[0]);
+        }
+
+        String url = parts[1];
+
+
+        // url
+
+        String[] urlParts = url.split("\\?", 2);
+        String path = urlParts[0];
+
+        Map<String, String> queryParams = new HashMap<>();
+        if (urlParts.length == 2) {
+            for (String pair : urlParts[1].split("&")) {
+                String[] kv = pair.split("=", 2);
+                String key = kv[0];
+                String value = (kv.length == 2) ? kv[1] : "";
+                queryParams.put(key, value);
+            }
+        }
+
+        // HTTP-Version 검증
+        String version = parts[2];
+
+        if (!version.matches("HTTP/\\d\\.\\d")) {
+            throw new IllegalArgumentException("Invalid HTTP version: " + version);
+        }
+
+        /*
+         * 2. Headers
+         * */
+
+        Map<String, String> headers = new HashMap<>();
+
+        while (true) {
+            String line = readLine(buffer);
+            if (line == null) {
+                buffer.reset();
+                return null;
+            }
+
+            // 빈 줄 → 헤더 종료
+            if (line.isEmpty()) {
+                break;
+            }
+
+            // CR/LF 내부 금지
+            if (line.indexOf('\r') != -1 || line.indexOf('\n') != -1) {
+                throw new IllegalArgumentException("Invalid CR/LF in header");
+            }
+
+            int idx = line.indexOf(':');
+            if (idx <= 0) {
+                throw new IllegalArgumentException("Invalid header field: " + line);
+            }
+
+            String name = line.substring(0, idx);
+            String value = line.substring(idx + 1);
+
+            // 대소문자 무시를 위한 정규화
+            name = name.toLowerCase(Locale.ROOT);
+            value = value.trim();
+
+            headers.put(name, value);
+        }
+
+        return new HttpRequest(method, path, queryParams, version, headers);
     }
 
     private static String readLine(ByteBuffer buffer) {

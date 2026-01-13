@@ -2,6 +2,7 @@ package myapp.config;
 
 import myapp.application.PageHandler;
 import myapp.article.ArticleHandler;
+import myapp.file.FileHandler;
 import myapp.handler.HandlerRegister;
 import myapp.user.UserHandler;
 
@@ -15,6 +16,7 @@ public class HandlerConfig {
         UserHandler userHandler = new UserHandler();
         PageHandler pageHandler = new PageHandler();
         ArticleHandler articleHandler = new ArticleHandler();
+        FileHandler fileHandler = new FileHandler();
 
         /*
          * 어노테이션 기반 등록
@@ -22,6 +24,7 @@ public class HandlerConfig {
         handlerRegister.register(userHandler);
         handlerRegister.register(pageHandler);
         handlerRegister.register(articleHandler);
+        handlerRegister.register(fileHandler);
 
         return handlerRegister;
     }

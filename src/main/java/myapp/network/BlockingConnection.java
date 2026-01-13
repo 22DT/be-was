@@ -56,5 +56,30 @@ public class BlockingConnection implements Connection {
     public Socket getSocket() {
         return this.socket;
     }
+
+    public byte[] readExactly(ByteBuffer buffer, int length) throws IOException {
+
+        byte[] body = new byte[length];
+        int offset = 0;
+
+        // 1. buffer에 이미 있는 데이터부터 소비
+        int available = Math.min(buffer.remaining(), length);
+        buffer.get(body, 0, available);
+        offset += available;
+
+        // 2. 부족하면 소켓에서 직접 읽기
+        while (offset < length) {
+            int read = read(ByteBuffer.wrap(body, offset, length - offset));
+
+            if (read == -1) {
+                throw new IOException("Unexpected EOF while reading body");
+            }
+
+            offset += read;
+        }
+
+        return body;
+    }
+
 }
 

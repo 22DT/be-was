@@ -1,5 +1,6 @@
 package myapp.http;
 
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +11,7 @@ public class HttpRequest {
     private final Map<String, String> queryParams;
     private final String version;
     private final Map<String, String> headers;
-    private final byte[] body;
+    private byte[] body;
     private Map<String, String> pathVariables = new HashMap<>();
 
     public HttpRequest(HttpMethod method,
@@ -25,6 +26,15 @@ public class HttpRequest {
         this.version = version;
         this.headers = headers;
         this.body = body;
+    }
+
+    public HttpRequest(HttpMethod method, String path, Map<String, String> queryParams,
+                       String version, Map<String, String> headers) {
+        this.method = method;
+        this.path = path;
+        this.queryParams = queryParams;
+        this.version = version;
+        this.headers = headers;
     }
 
     public HttpMethod getMethod() {
@@ -78,16 +88,18 @@ public class HttpRequest {
 
         for (String pair : pairs) {
             String[] kv = pair.split("=", 2);
-            String key = kv[0];
-            String value = (kv.length == 2) ? kv[1] : "";
+
+            String key = URLDecoder.decode(kv[0], StandardCharsets.UTF_8);
+            String value = (kv.length == 2)
+                    ? URLDecoder.decode(kv[1], StandardCharsets.UTF_8)
+                    : "";
 
             params.put(key, value);
         }
 
-
         return params;
-
     }
+
 
     public String getCookie(String name) {
         String cookieHeader = headers.get(HttpHeader.COOKIE.lower());
@@ -114,6 +126,15 @@ public class HttpRequest {
 
     public String getPathVariable(String name) {
         return pathVariables.get(name);
+    }
+
+    public String getHeader(HttpHeader header) {
+        String lower = header.lower();
+        return headers.get(lower);
+    }
+
+    public void setBody(byte[] body) {
+        this.body = body;
     }
 
 

@@ -2,7 +2,6 @@ package myapp.user;
 
 import myapp.WebServer;
 import myapp.bean.Component;
-import myapp.db.UserDatabase;
 import myapp.handler.HandlerMapping;
 import myapp.http.HttpHeader;
 import myapp.http.HttpMethod;

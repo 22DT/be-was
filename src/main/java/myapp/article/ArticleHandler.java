@@ -1,6 +1,7 @@
 package myapp.article;
 
-import myapp.db.ArticleDatabase;
+import myapp.file.FileDataBase;
+import myapp.file.FileInfo;
 import myapp.handler.HandlerMapping;
 import myapp.http.HttpHeader;
 import myapp.http.HttpMethod;
@@ -13,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 
 
@@ -53,14 +55,28 @@ public class ArticleHandler {
             logger.warn("[create][content null or blank]");
         }
 
+        String imagePath = params.get("imagePath");
+
 
 
         /*
          * 비즈니스 로직
          * */
 
+
+        // 게시글 생성
         Article article = ArticleDatabase.addArticle(user.getUserId(), content);
 
+        // 파일 갖고 온다
+        if (imagePath != null && !imagePath.isBlank()) {
+            FileInfo file = FileDataBase.findByPath(imagePath);
+
+            Long fileId = file.fileId();
+
+            ArticleFile articleFile = new ArticleFile(article.articleId(), fileId);
+
+            ArticleFileDatabase.save(articleFile);
+        }
 
         /*
          * response
@@ -97,6 +113,25 @@ public class ArticleHandler {
             response.setBody("Article Not Found".getBytes(StandardCharsets.UTF_8));
             return;
         }
+
+        // 파일
+
+        List<Long> fileIds =
+                ArticleFileDatabase.findFileIdsByArticleId(article.articleId());
+
+        String imageHtml = "";
+
+        if (!fileIds.isEmpty()) {
+            Long fileId = fileIds.get(0); //  첫 번째 파일만 사용
+            FileInfo file = FileDataBase.findById(fileId);
+
+            if (file != null) {
+                imageHtml = """
+                        <img class="post__img" src="%s"/>
+                        """.formatted(file.path());
+            }
+        }
+
 
         // html 처리
         String html = HtmlLoader.loadTemplate("/article/detail.html");
@@ -138,6 +173,8 @@ public class ArticleHandler {
                 .replace("\n", "<br>");
 
         html = html.replace("{{content}}", content);
+
+        html = html.replace("{{ARTICLE_IMAGE}}", imageHtml);
 
         /*
          * response

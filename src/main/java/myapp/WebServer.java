@@ -5,6 +5,8 @@ import myapp.application.StaticResourceHandler;
 import myapp.config.HandlerConfig;
 import myapp.handler.HandlerRegister;
 import myapp.network.BlockingConnection;
+import myapp.user.User;
+import myapp.user.UserDatabase;
 import myapp.webserver.ConnectionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +40,10 @@ public class WebServer {
 
         ExecutorService executor =
                 Executors.newFixedThreadPool(THREAD_POOL_SIZE);
+
+        // 기본 사용자 등록
+        User user = new User("a", "a", "a", "a@a.com");
+        UserDatabase.addUser(user);
 
         try (ServerSocket listenSocket = new ServerSocket(port)) {
             logger.info("Web Application Server started {} port.", port);

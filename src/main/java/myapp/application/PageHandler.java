@@ -114,7 +114,7 @@ public class PageHandler {
     }
 
 
-    @HandlerMapping(method = HttpMethod.GET, path = "/article/index.html")
+    @HandlerMapping(method = HttpMethod.GET, path = "/article/write.html")
     public void redirectToWriteOrLogin(HttpRequest request, HttpResponse response) {
         /*
          * 로그인 여부 확인
