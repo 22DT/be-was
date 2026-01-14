@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class FileDataBase {
+public class FileDatabase {
     private static final Map<Long, FileInfo> files = new ConcurrentHashMap<>();
     private static final AtomicLong File_ID_SEQUENCE = new AtomicLong(1);
 

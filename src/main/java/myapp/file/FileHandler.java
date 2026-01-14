@@ -53,7 +53,7 @@ public class FileHandler {
             // 2. 메모리 DB 저장
             String path = "/upload/" + storedName;
 
-            FileInfo savedFile = FileDataBase.save(
+            FileInfo savedFile = FileDatabase.save(
                     file.fileName(),          // originalName
                     storedName,               // storedName
                     file.contentType(),       // contentType

@@ -2,15 +2,19 @@ package myapp.user;
 
 import myapp.WebServer;
 import myapp.bean.Component;
+import myapp.file.UploadedFile;
 import myapp.handler.HandlerMapping;
-import myapp.http.HttpHeader;
-import myapp.http.HttpMethod;
-import myapp.http.HttpRequest;
-import myapp.http.HttpResponse;
+import myapp.http.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
+import java.util.UUID;
 
 @Component
 public class UserHandler {
@@ -100,5 +104,72 @@ public class UserHandler {
         response.setStatus(302, "Found");
         response.addHeader(HttpHeader.SET_COOKIE.value(), "SID=" + sessionId + "; Path=/");
         response.addHeader(HttpHeader.LOCATION.value(), "/index.html");
+    }
+
+    @HandlerMapping(method = HttpMethod.POST, path = "/users/profile-image")
+    public void uploadProfileImage(HttpRequest request, HttpResponse response) {
+
+        /*
+         * 1. request
+         */
+
+        // 1-1. 로그인 세션 확인
+        String sessionId = request.getCookie(SessionManager.SESSION_COOKIE_NAME);
+        User user = SessionManager.getLoginUser(sessionId);
+
+        if (user == null) {
+            response.setStatus(302, "Found");
+            response.addHeader(HttpHeader.LOCATION.value(), "/login");
+            return;
+        }
+
+        // 1-2. multipart 파일 파싱
+        UploadedFile file = BodyParser.getMultipart(request);
+
+        if (file == null) {
+            response.badRequest();
+            response.setBody("file not found".getBytes(StandardCharsets.UTF_8));
+            return;
+        }
+
+        /*
+         * 2. 비즈니스 로직
+         */
+
+        try {
+            // 2-1. 업로드 디렉토리 생성
+            Path uploadDir = Paths.get("upload");
+            Files.createDirectories(uploadDir);
+
+            // 2-2. 파일 저장
+            String storedName = UUID.randomUUID() + "_" + file.fileName();
+            Path storedPath = uploadDir.resolve(storedName);
+
+            Files.write(storedPath, file.data());
+
+            // 2-3. (선택) 기존 프로필 이미지 삭제
+            if (user.getProfileImage() != null) {
+                String oldFileName =
+                        Paths.get(user.getProfileImage()).getFileName().toString();
+                Path oldPath = uploadDir.resolve(oldFileName);
+
+                Files.deleteIfExists(oldPath);
+            }
+
+            // 2-4. 사용자 정보 갱신
+            String imagePath = storedName;
+            user.updateProfileImage(imagePath);
+
+        } catch (IOException e) {
+            logger.error("profile image upload failed", e);
+            response.internalServerError();
+            return;
+        }
+
+        /*
+         * 3. response
+         */
+
+        response.ok();
     }
 }

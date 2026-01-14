@@ -26,20 +26,35 @@
 
         <div class="profile_container">
           <div class="profile_box">
-              <div class="profile_image">
-                <img class="profile" />
+            <div class="profile_image">
+                <img
+                    class="profile"
+                    id="profile-img"
+                    src="{{PROFILE_IMAGE_URL}}"
+                />
+
+            </div>
+
+            <input
+                  type="file"
+                  id="profile-image-input"
+                  accept="image/*"
+                  hidden
+            />
+
+            <div class="profile_frame">
+              <div class="btn_profile">
+                <div class="btn_container" id="profile-edit-btn">수정</div>
               </div>
-              <div class="profile_frame">
-                  <div class="btn_profile">
-                        <div class="btn_container">수정</div>
-                  </div>
-                  <div class="btn_bar"></div>
-                  <div class="btn_profile">
-                      <div class="btn_container">삭제</div>
-                  </div>
+              <div class="btn_bar"></div>
+              <div class="btn_profile">
+                <div class="btn_container" id="profile-delete-btn">삭제</div>
               </div>
+            </div>
+          </div>
         </div>
-          <form class="form">
+
+        <form class="form">
             <div class="textfield textfield_size_s input_margin">
               <p class="title_textfield">닉네임</p>
                 <input
@@ -80,3 +95,41 @@
     </div>
   </body>
 </html>
+
+<script>
+  // 수정 버튼 → 파일 선택
+  document.getElementById("profile-edit-btn")
+    .addEventListener("click", () => {
+      document.getElementById("profile-image-input").click();
+    });
+
+  // 파일 선택 후 업로드
+  document.getElementById("profile-image-input")
+    .addEventListener("change", async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      await fetch("/users/profile-image", {
+        method: "POST",
+        body: formData
+      });
+
+      location.reload();
+    });
+
+  // 삭제 버튼
+  document.getElementById("profile-delete-btn")
+    .addEventListener("click", async () => {
+      if (!confirm("프로필 이미지를 삭제할까요?")) return;
+
+      await fetch("/users/profile-image", {
+        method: "DELETE"
+      });
+
+      location.reload();
+    });
+</script>
+

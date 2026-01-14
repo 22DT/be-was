@@ -10,6 +10,7 @@ import myapp.user.SessionManager;
 import myapp.user.User;
 import myapp.webserver.HtmlLoader;
 
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 @Component
@@ -76,39 +77,52 @@ public class PageHandler {
 
     @HandlerMapping(method = HttpMethod.GET, path = "/mypage")
     public void myPage(HttpRequest request, HttpResponse response) {
+
         /*
          * 1. 세션 확인
-         * */
+         */
         String sessionId = request.getCookie(SessionManager.SESSION_COOKIE_NAME);
         User user = SessionManager.getLoginUser(sessionId);
 
         /*
          * 2. 로그인 안 되어 있으면 redirect
-         * */
+         */
         if (user == null) {
             response.setStatus(302, "Found");
             response.addHeader(HttpHeader.LOCATION.value(), "/login");
-
             return;
         }
 
         /*
-         * 3. mypage.html 읽기
-         * */
-
+         * 3. html 로드
+         */
         String html = HtmlLoader.loadStatic("/mypage/index.html");
 
         /*
-         * 4. 사용자 정보로 html 가공
-         * */
-
+         * 4. html 가공
+         */
+        // 닉네임
         html = html.replace("{{USER_NAME}}", user.getName());
 
-        /*
-         * 5. 응답
-         * */
+        // 프로필 이미지
+        String profileImageUrl;
 
-        response.setStatus(200, "OK");
+        if (user.getProfileImage() != null) {
+            profileImageUrl = "/files/" + URLEncoder.encode(
+                    user.getProfileImage(),
+                    StandardCharsets.UTF_8
+            );
+        } else {
+            profileImageUrl = "/img/default-profile.png";
+        }
+
+        html = html.replace("{{PROFILE_IMAGE_URL}}", profileImageUrl);
+
+
+        /*
+         * 5. response
+         */
+        response.ok();
         response.addHeader(HttpHeader.CONTENT_TYPE.value(), "text/html; charset=UTF-8");
         response.setBody(html.getBytes(StandardCharsets.UTF_8));
     }

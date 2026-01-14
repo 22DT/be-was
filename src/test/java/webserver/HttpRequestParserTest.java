@@ -65,7 +65,7 @@ class HttpRequestParserTest {
         assertEquals("/create", httpRequest.getPath());
         assertEquals(2, httpRequest.getQueryParams().size());
 
-        assertEquals("user", httpRequest.getQueryParams().get("userId"));
+        assertEquals("templates/user", httpRequest.getQueryParams().get("userId"));
         assertEquals("pass", httpRequest.getQueryParams().get("password"));
 
     }

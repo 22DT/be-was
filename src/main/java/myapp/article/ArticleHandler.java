@@ -1,6 +1,6 @@
 package myapp.article;
 
-import myapp.file.FileDataBase;
+import myapp.file.FileDatabase;
 import myapp.file.FileInfo;
 import myapp.handler.HandlerMapping;
 import myapp.http.HttpHeader;
@@ -69,7 +69,7 @@ public class ArticleHandler {
 
         // 파일 갖고 온다
         if (imagePath != null && !imagePath.isBlank()) {
-            FileInfo file = FileDataBase.findByPath(imagePath);
+            FileInfo file = FileDatabase.findByPath(imagePath);
 
             Long fileId = file.fileId();
 
@@ -123,7 +123,7 @@ public class ArticleHandler {
 
         if (!fileIds.isEmpty()) {
             Long fileId = fileIds.get(0); //  첫 번째 파일만 사용
-            FileInfo file = FileDataBase.findById(fileId);
+            FileInfo file = FileDatabase.findById(fileId);
 
             if (file != null) {
                 imageHtml = """
