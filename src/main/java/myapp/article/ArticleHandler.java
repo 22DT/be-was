@@ -127,8 +127,9 @@ public class ArticleHandler {
 
             if (file != null) {
                 imageHtml = """
-                        <img class="post__img" src="%s"/>
-                        """.formatted(file.path());
+                            <img class="post__img" src="/files/%s"/>
+                        """.formatted(file.storedName());
+
             }
         }
 
