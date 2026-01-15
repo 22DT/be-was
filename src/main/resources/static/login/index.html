@@ -23,15 +23,20 @@
       </header>
       <div class="page">
         <h2 class="page-title">로그인</h2>
+        <p class="error-message">
+          {{ERROR_MESSAGE}}
+        </p>
         <form class="form" action="/user/login" method="post">
           <div class="textfield textfield_size_s">
             <p class="title_textfield">아이디</p>
-            <input
-              class="input_textfield"
-              name="userId"
-              placeholder="아이디를 입력해주세요"
-              autocomplete="username"
-            />
+              <input
+                  class="input_textfield"
+                  name="userId"
+                  value="{{USER_ID}}"
+                  placeholder="아이디를 입력해주세요"
+                  autocomplete="username"
+              />
+
           </div>
           <div class="textfield textfield_size_s">
             <p class="title_textfield">비밀번호</p>

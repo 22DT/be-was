@@ -42,7 +42,7 @@ public class WebServer {
                 Executors.newFixedThreadPool(THREAD_POOL_SIZE);
 
         // 기본 사용자 등록
-        User user = new User("a", "a", "a", "a@a.com");
+        User user = new User("a", "a", "a");
         UserDatabase.addUser(user);
 
         try (ServerSocket listenSocket = new ServerSocket(port)) {

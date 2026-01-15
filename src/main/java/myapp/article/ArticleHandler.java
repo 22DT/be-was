@@ -57,6 +57,10 @@ public class ArticleHandler {
 
         String imagePath = params.get("imagePath");
 
+        if (imagePath == null || imagePath.isBlank()) {
+            throw new IllegalArgumentException("이미지는 반드시 첨부해야 합니다.");
+        }
+
 
 
         /*

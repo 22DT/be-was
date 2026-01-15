@@ -5,6 +5,7 @@ import myapp.bean.Component;
 import myapp.file.UploadedFile;
 import myapp.handler.HandlerMapping;
 import myapp.http.*;
+import myapp.webserver.HtmlLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,79 +33,138 @@ public class UserHandler {
         String userId = params.get("userId");
         String password = params.get("password");
         String name = params.get("name");
-        String email = params.get("email");
 
         if (userId == null || userId.isBlank() || password == null || password.isBlank()
-                || name == null || name.isBlank() || email == null || email.isBlank()) {
+                || name == null || name.isBlank()) {
             throw new IllegalArgumentException("필수 회원가입 파라미터 누락");
         }
 
-        User user = new User(userId, password, name, email);
+        User user = new User(userId, password, name);
+
+        //  길이 검증 (최소 4글자)
+        if (userId.length() < 4) {
+            throw new IllegalArgumentException("아이디는 최소 4글자 이상이어야 합니다.");
+        }
+
+        if (name.length() < 4) {
+            throw new IllegalArgumentException("닉네임은 최소 4글자 이상이어야 합니다.");
+        }
+
+        if (password.length() < 4) {
+            throw new IllegalArgumentException("비밀번호는 최소 4글자 이상이어야 합니다.");
+        }
 
         /*
          * 비즈니스 로직
          */
-        User prev = UserDatabase.addUser(user);
-        if (prev != null) {
-            throw new IllegalArgumentException(
-                    "이미 존재하는 userId: " + user.getUserId()
-            );
-        }
+        UserDatabase.addUser(user);
 
         /*
          * redirect response
          */
         response.setStatus(302, "Found");
-        response.addHeader(HttpHeader.LOCATION.value(), "/index.html");
+        response.addHeader(HttpHeader.LOCATION.value(), "/login");
     }
 
 
     @HandlerMapping(method = HttpMethod.POST, path = "/user/login")
     public void login(HttpRequest request, HttpResponse response) {
 
-        /*
-         * request
-         * */
-
         Map<String, String> bodyParams = request.getBodyParams();
-
         String userId = bodyParams.get("userId");
         String password = bodyParams.get("password");
 
-        if (userId == null || userId.isBlank() || password == null || password.isBlank()) {
-            throw new IllegalArgumentException("필수 회원가입 파라미터 누락");
-        }
-
-
-        /*
-         * 비즈니스 로직
-         * */
-
         User user = UserDatabase.findUserById(userId);
 
-        // 1. 아이디 없음
+        // 아이디 없음 → 별도 안내 페이지
         if (user == null) {
-            throw new IllegalArgumentException("존재하지 않는 사용자입니다.");
+            renderErrorPage(
+                    response,
+                    "존재하지 않는 아이디입니다.",
+                    "/registration",
+                    "회원 가입"
+            );
+            return;
         }
 
-        // 2. 비밀번호 불일치
+        // 비밀번호 틀림 → 로그인 페이지 유지
         if (!user.getPassword().equals(password)) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            String html = HtmlLoader.loadStatic("/login/index.html");
+            html = html.replace(
+                    "{{ERROR_MESSAGE}}",
+                    "비밀번호가 틀렸습니다."
+            );
+            html = html.replace("{{USER_ID}}", escapeHtml(userId));
+
+
+            response.setStatus(200, "OK");
+            response.addHeader(
+                    HttpHeader.CONTENT_TYPE.value(),
+                    "text/html; charset=UTF-8"
+            );
+            response.setBody(html.getBytes(StandardCharsets.UTF_8));
+            return;
         }
 
-        // 3. 로그인 성공
-
-        // 세션 생성
+        // 성공
         String sessionId = SessionManager.createSession(user);
-
-        /*
-         * response
-         * */
-
         response.setStatus(302, "Found");
-        response.addHeader(HttpHeader.SET_COOKIE.value(), "SID=" + sessionId + "; Path=/");
-        response.addHeader(HttpHeader.LOCATION.value(), "/index.html");
+        response.addHeader(
+                HttpHeader.SET_COOKIE.value(),
+                "SID=" + sessionId + "; Path=/"
+        );
+        response.addHeader(
+                HttpHeader.LOCATION.value(),
+                "/index.html"
+        );
     }
+
+    private String escapeHtml(String text) {
+        return text
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;");
+    }
+
+
+    private void renderErrorPage(
+            HttpResponse response,
+            String message,
+            String buttonLink,
+            String buttonText
+    ) {
+        String html = """
+                <!DOCTYPE html>
+                <html lang="ko">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>로그인 실패</title>
+                    <link href="/reset.css" rel="stylesheet"/>
+                    <link href="/global.css" rel="stylesheet"/>
+                </head>
+                <body>
+                    <div class="container">
+                        <h2>%s</h2>
+                
+                        <div style="margin-top: 20px;">
+                            <a class="btn btn_primary btn_size_m" href="%s">
+                                %s
+                            </a>
+                        </div>
+                    </div>
+                </body>
+                </html>
+                """.formatted(message, buttonLink, buttonText);
+
+        response.setStatus(200, "OK");
+        response.addHeader(
+                HttpHeader.CONTENT_TYPE.value(),
+                "text/html; charset=UTF-8"
+        );
+        response.setBody(html.getBytes(StandardCharsets.UTF_8));
+    }
+
 
     @HandlerMapping(method = HttpMethod.POST, path = "/users/profile-image")
     public void uploadProfileImage(HttpRequest request, HttpResponse response) {
@@ -172,4 +232,62 @@ public class UserHandler {
 
         response.ok();
     }
+
+    @HandlerMapping(method = HttpMethod.DELETE, path = "/users/profile-image")
+    public void deleteProfileImage(HttpRequest request, HttpResponse response) {
+
+        /*
+         * 1. request
+         */
+
+        // 1-1. 로그인 세션 확인
+        String sessionId = request.getCookie(SessionManager.SESSION_COOKIE_NAME);
+        User user = SessionManager.getLoginUser(sessionId);
+
+        if (user == null) {
+            response.setStatus(302, "Found");
+            response.addHeader(HttpHeader.LOCATION.value(), "/login");
+            return;
+        }
+
+
+
+        /*
+         * 2. 비즈니스 로직
+         */
+
+        user.deleteProfileImage();
+
+        /*
+         * 3. response
+         */
+
+        response.ok();
+    }
+
+    @HandlerMapping(method = HttpMethod.GET, path = "/logout")
+    public void logout(HttpRequest request, HttpResponse response) {
+
+        // 1. 쿠키에서 SID 가져오기
+        String sessionId = request.getCookie(SessionManager.SESSION_COOKIE_NAME);
+
+        // 2. 세션 삭제
+        SessionManager.expire(sessionId);
+
+        /*
+         * response
+         * */
+
+        response.setStatus(302, "Found");
+
+        // 3. 쿠키 만료 (브라우저에서 제거)
+        response.addHeader(
+                HttpHeader.SET_COOKIE.value(),
+                "SID=; Path=/; Max-Age=0"
+        );
+
+        // 4. 홈으로 리다이렉트
+        response.addHeader(HttpHeader.LOCATION.value(), "/index.html");
+    }
+
 }

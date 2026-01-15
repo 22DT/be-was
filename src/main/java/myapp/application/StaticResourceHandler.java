@@ -11,7 +11,7 @@ import java.nio.file.Files;
 
 @Component("staticHandler")
 public class StaticResourceHandler {
-    private static final String STATIC_DIR = "src/main/resources/static";
+    private static final String STATIC_DIR = "./src/main/resources/static";
 
 
     public void handle(HttpRequest request, HttpResponse response) {

@@ -2,6 +2,7 @@ package myapp.article;
 
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -30,4 +31,13 @@ public class ArticleDatabase {
     public static Collection<Article> findAll() {
         return Articles.values();
     }
+
+    public static Article findLatest() {
+        return Articles.values()
+                .stream()
+                .max(Comparator.comparingLong(Article::articleId))
+                .orElse(null);
+    }
+
+
 }

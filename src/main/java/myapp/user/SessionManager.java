@@ -22,4 +22,10 @@ public class SessionManager {
         }
         return sessions.get(sessionId);
     }
+
+    public static void expire(String sessionId) {
+        if (sessionId != null) {
+            sessions.remove(sessionId);
+        }
+    }
 }
